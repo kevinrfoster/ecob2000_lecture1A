@@ -1,1 +1,0 @@
-# ecob2000_lecture1A
