@@ -7,171 +7,96 @@ R Basics for Lecture 1 A
 
 ## Variable Coding
 
-Some of the PUMS variables here have a natural interpretation, for
-instance Age is measured in years. Actually even this has a bit of a
-twist, look at the histogram.
+Some of the HouseholdPulse variables here have a natural interpretation,
+for instance TBIRTH_YEAR is measured in years. Actually even this has a
+bit of a twist, look at the histogram.
 
 ``` r
-hist(AGE[(AGE > 90)])
+hist(TBIRTH_YEAR[(TBIRTH_YEAR < 1950)])
 ```
 
-![](lecture_1A_files/figure-gfm/unnamed-chunk-2-1.png)<!-- -->
+![](lecture_1A_HHPulse_files/figure-gfm/unnamed-chunk-2-1.png)<!-- -->
 
-There is a bit of weirdness in the right, where it looks like there are
-suddenly a bunch of people who are 95 but nobody is 94 or 96. This is
-due to a coding choice by the Census, where really old people are just
-labeled as “95” (top-coding) so it actually should be interpreted as
-meaning “92 or older”. So if you were to get finicky (and every good
-statistician is\!) you might go back to the calculations of averages
-previously and modify them all like this, to select just those who are
-female and who are coded as having age less than 90. Many variables are
-topcoded\! *And recall that topcoding wouldn’t change the median values
-calculated before, which is a point in favor of that statistic.*
+There is a bit of weirdness in the left, where it looks like there are
+suddenly a bunch of people who were born in 1933 but nobody in 1932 or
+earlier. This is due to a coding choice by the Census, where really old
+people are labeled as born in “1933” (top-coding) but it actually should
+be interpreted as meaning “in 1933 or before”. So if you were to get
+finicky (and every good statistician is!) you might go back to the
+calculations of averages previously and modify them all. For instance,
+to select just those who are female and who are coded as having age less
+than 90. Many variables are topcoded! *And recall that topcoding
+wouldn’t change the median values calculated before, which is a point in
+favor of that statistic.*
 
 ``` r
-mean(AGE[ (female == 1) & (AGE<90) ]) 
+mean(TBIRTH_YEAR[ (GENID_DESCRIBE == "female") & (TBIRTH_YEAR > 1933) ]) 
 ```
 
-    ## [1] 41.98866
+    ## [1] 1968.792
 
 You go make those other changes, figure out how top-coding changes the
 calculations of average age by gender – I’ll wait right here…
 
 ## Variable Coding Again
 
-So we were saying that some variables, like Age - ahem\! – have a
+So we were saying that some variables, like Birth Year - ahem! – have a
 natural interpretation as a number.
 
-Others are logical variables (called dummies) like female, Hispanic, or
-married - there is a yes/no answer that is coded 1/0. *Note that if
-you’re creating these on your own it’s good to give names that have
-that sort of yes/no answer, so a variable named ‘female’ is better than
-one named ‘gender’ where you’d have to remember who are coded as true
-and who are false.*
+Others are logical variables (called dummies) like GENID_DESCRIBE,
+RHISPANIC, or RECVDVACC - there is a series of yes/no answers that are
+coded 1/0. *Note that if you’re creating these on your own it’s good to
+give names that have that sort of yes/no answer, so a variable named
+‘RECVDVACC’ is good, since it’s easy to remember that Yes or No answers
+“did the person receive a vaccine”. If that were labeled as ‘vaccstatus’
+then you’d have to remember who are coded as true and who are false.*
 
-Many variables, like PUMA, have no natural explanation at all. Here are
-the first codes,
+Dummy variables get A TON of use and the R language provides lots of
+help with them – they’re called factors in the R language. Basically a
+factor lumps together a bunch of 0/1 answers.
 
-``` r
-str(as.numeric(PUMA))
-```
-
-    ##  num [1:196585] 902 902 4002 4002 3803 ...
-
-You have to go to the codebook (or, in this case, the file
-PUMA\_levels.csv or acs2017\_codebook.txt from the zip file) to find out
-that 3801 codes for Washington Heights/Inwood, 3802 is Hamilton
-Heights/Manhattanville/West Harlem, etc. The program will happily
-calculate the average value for PUMA (type in *mean(PUMA)* and see for
-yourself\!) but this is a meaningless value – wtf is the average
-neighborhood code value\!? If you want to select just people living in a
-particular neighborhood then you’d have to look at the list below.
-
-| PUMA | Neighborhood                                                        |
-| ---- | ------------------------------------------------------------------- |
-| 3701 | NYC-Bronx CD 8–Riverdale, Fieldston & Kingsbridge                   |
-| 3702 | NYC-Bronx CD 12–Wakefield, Williamsbridge & Woodlawn                |
-| 3703 | NYC-Bronx CD 10–Co-op City, Pelham Bay & Schuylerville              |
-| 3704 | NYC-Bronx CD 11–Pelham Parkway, Morris Park & Laconia               |
-| 3705 | NYC-Bronx CD 3 & 6–Belmont, Crotona Park East & East Tremont        |
-| 3706 | NYC-Bronx CD 7–Bedford Park, Fordham North & Norwood                |
-| 3707 | NYC-Bronx CD 5–Morris Heights, Fordham South & Mount Hope           |
-| 3708 | NYC-Bronx CD 4–Concourse, Highbridge & Mount Eden                   |
-| 3709 | NYC-Bronx CD 9–Castle Hill, Clason Point & Parkchester              |
-| 3710 | NYC-Bronx CD 1 & 2–Hunts Point, Longwood & Melrose                  |
-| 3801 | NYC-Manhattan CD 12–Washington Heights, Inwood & Marble Hill        |
-| 3802 | NYC-Manhattan CD 9–Hamilton Heights, Manhattanville & West Harlem   |
-| 3803 | NYC-Manhattan CD 10–Central Harlem                                  |
-| 3804 | NYC-Manhattan CD 11–East Harlem                                     |
-| 3805 | NYC-Manhattan CD 8–Upper East Side                                  |
-| 3806 | NYC-Manhattan CD 7–Upper West Side & West Side                      |
-| 3807 | NYC-Manhattan CD 4 & 5–Chelsea, Clinton & Midtown Business District |
-| 3808 | NYC-Manhattan CD 6–Murray Hill, Gramercy & Stuyvesant Town          |
-| 3809 | NYC-Manhattan CD 3–Chinatown & Lower East Side                      |
-| 3810 | NYC-Manhattan CD 1 & 2–Battery Park City, Greenwich Village & Soho  |
-| 3901 | NYC-Staten Island CD 3–Tottenville, Great Kills & Annadale          |
-| 3902 | NYC-Staten Island CD 2–New Springville & South Beach                |
-| 3903 | NYC-Staten Island CD 1–Port Richmond, Stapleton & Mariner’s Harbor  |
-| 4001 | NYC-Brooklyn CD 1–Greenpoint & Williamsburg                         |
-| 4002 | NYC-Brooklyn CD 4—Bushwick                                          |
-| 4003 | NYC-Brooklyn CD 3–Bedford-Stuyvesant                                |
-| 4004 | NYC-Brooklyn CD 2–Brooklyn Heights & Fort Greene                    |
-| 4005 | NYC-Brooklyn CD 6–Park Slope, Carroll Gardens & Red Hook            |
-| 4006 | NYC-Brooklyn CD 8–Crown Heights North & Prospect Heights            |
-| 4007 | NYC-Brooklyn CD 16–Brownsville & Ocean Hill                         |
-| 4008 | NYC-Brooklyn CD 5–East New York & Starrett City                     |
-| 4009 | NYC-Brooklyn CD 18–Canarsie & Flatlands                             |
-| 4010 | NYC-Brooklyn CD 17–East Flatbush, Farragut & Rugby                  |
-| 4011 | NYC-Brooklyn CD 9–Crown Heights South, Prospect Lefferts & Wingate  |
-| 4012 | NYC-Brooklyn CD 7–Sunset Park & Windsor Terrace                     |
-| 4013 | NYC-Brooklyn CD 10–Bay Ridge & Dyker Heights                        |
-| 4014 | NYC-Brooklyn CD 12–Borough Park, Kensington & Ocean Parkway         |
-| 4015 | NYC-Brooklyn CD 14–Flatbush & Midwood                               |
-| 4016 | NYC-Brooklyn CD 15–Sheepshead Bay, Gerritsen Beach & Homecrest      |
-| 4017 | NYC-Brooklyn CD 11–Bensonhurst & Bath Beach                         |
-| 4018 | NYC-Brooklyn CD 13–Brighton Beach & Coney Island                    |
-| 4101 | NYC-Queens CD 1–Astoria & Long Island City                          |
-| 4102 | NYC-Queens CD 3–Jackson Heights & North Corona                      |
-| 4103 | NYC-Queens CD 7–Flushing, Murray Hill & Whitestone                  |
-| 4104 | NYC-Queens CD 11–Bayside, Douglaston & Little Neck                  |
-| 4105 | NYC-Queens CD 13–Queens Village, Cambria Heights & Rosedale         |
-| 4106 | NYC-Queens CD 8–Briarwood, Fresh Meadows & Hillcrest                |
-| 4107 | NYC-Queens CD 4–Elmhurst & South Corona                             |
-| 4108 | NYC-Queens CD 6–Forest Hills & Rego Park                            |
-| 4109 | NYC-Queens CD 2–Sunnyside & Woodside                                |
-| 4110 | NYC-Queens CD 5–Ridgewood, Glendale & Middle Village                |
-| 4111 | NYC-Queens CD 9–Richmond Hill & Woodhaven                           |
-| 4112 | NYC-Queens CD 12–Jamaica, Hollis & St. Albans                       |
-| 4113 | NYC-Queens CD 10–Howard Beach & Ozone Park                          |
-| 4114 | NYC-Queens CD 14–Far Rockaway, Breezy Point & Broad Channel         |
-
-Now you’re probably thinking, isn’t there some easier way? Yes there is.
-R has variables called “factors” that join together the long list of
-codes with a separate file telling what those codes mean. Later when we
-do further statistics, R will know how to appropriately treat these
-factors. (Also it will then give an error if you calculate mean(PUMA),
-which is proper.)
+The factor, ‘RHISPANIC’, is a single y/n or 0/1 answer: is the
+respondent Hispanic. But then EEDUC is a whole bunch of y/n answers: is
+the person’s highest completed educational level less than high school;
+is the person’s highest completed educational level some high school;
+did they end after getting high school diploma; etc. When you ask for a
+summary of EEDUC,
 
 ``` r
-PUMA <- as.factor(PUMA)
-female <- as.factor(female)
+summary(EEDUC)
 ```
 
-I will leave you to worry over the recoding of the other variables,
-because it’s good for the soul. I will show you 2 ways – the quick and
-dirty way, and the fancy correct way.
+    ## less than hs      some hs   HS diploma    some coll    assoc deg     bach deg 
+    ##          411          936         7857        14596         7508        20075 
+    ##      adv deg 
+    ##        17731
 
-First the quick and dirty way.
+R helpfully provides labels for each of those all together. Later when
+we get into more depth, we might have to dig into the y/n answers that
+are underneath.
 
-``` r
-print(levels(female))
-```
+It’s important to remember that there are some cases where the factor
+values are well ordered (as with highest educational qualification)
+versus others such as EST_ST (the state the person lives in) where there
+is not necessarily an ordering.
 
-    ## [1] "0" "1"
+Factors are really useful, enough that different people have developed
+packages specifically to manipulate factors.
 
-``` r
-levels(female) <- c("male","female")
-```
+### Packages
 
-Well, ways,
+R depends crucially on “packages” - that’s the whole reason that the
+open-source works. Some statistician invents a cool new technique, then
+writes up the code in R and makes it available. If you used a commercial
+program you’d have to wait a decade for them to update it; in R it’s
+here now. Also if somebody hacks a nicer or easier way to do stuff, they
+write it up. Packages are extensions for specific tasks and you can tell
+R to install specific ones. Many people who use R don’t need to create
+detailed maps but if you want that, there’s a package. If you want to
+analyze genetic sequences, there’s a package.
 
-``` r
-educ_indx <- factor((educ_nohs + 2*educ_hs + 3*educ_somecoll + 4*educ_college + 5*educ_advdeg), levels=c(1,2,3,4,5),labels = c("No HS","HS","SmColl","Bach","Adv"))
-```
-
-(If you can figure out how that bit of code works, that would be good)
-
-These just type in the levels. But for things like PUMA, it could be a
-long list and might not even match every one. To do it better, we need
-help from an R package.
-
-\#\#\#Detour on Packages But first a bit of a detour, to mention how to
-use packages. R depends crucially on “packages” - that’s the whole
-reason that the open-source works. Some statistician invents a cool new
-technique, then writes up the code in R and makes it available. If you
-used a commercial program you’d have to wait a decade for them to update
-it; in R it’s here now. Also if somebody hacks a nicer or easier way to
-do stuff, they write it up.
+Hadley Wickham wrote ‘forcats’ for categorical data (ie factors). It’s
+part of the ‘tidyverse’ package.
 
 So enter this into the Console,
 
@@ -182,446 +107,247 @@ then
 
 ``` r
 library(tidyverse)
-```
-
-    ## Warning: package 'ggplot2' was built under R version 3.6.3
-
-    ## Warning: package 'tibble' was built under R version 3.6.3
-
-    ## Warning: package 'tidyr' was built under R version 3.6.3
-
-    ## Warning: package 'purrr' was built under R version 3.6.3
-
-    ## Warning: package 'dplyr' was built under R version 3.6.3
-
-    ## Warning: package 'forcats' was built under R version 3.6.3
-
-``` r
 library(plyr)
 ```
 
-    ## Warning: package 'plyr' was built under R version 3.6.3
-
-``` r
-levels_n <- read.csv("PUMA_levels.csv")
-levels_orig <- levels(PUMA) 
-levels_new <- join(data.frame(levels_orig),data.frame(levels_n))
-levels(PUMA) <- levels_new$New_Level
-```
-
 Alt, from R-Studio, click “Tools” then “Install Packages…” and tell it
-to install the packages, “plyr” and “tidyverse”. That is nice if you
-want to see some of the packages or if you don’t quite remember the
-name. Then the next piece of code, library, tells the program that you
-want to use commands from this package.
+to install the package, “tidyverse”. That is nice if you want to see
+some of the packages or if you don’t quite remember the name. Then the
+next piece of code, library, tells the program that you want to use
+commands from this package. You only need to install once, then just put
+library() into your code and run that part.
 
-Those commands read in a little csv file that I had made, with the PUMA
-codes, then matches the old codes with the new complete text. Note that
-I’m lazy so codes in NY state outside of NYC are coded NA.
+### Factors
 
-\#\#\#Back from Detour R will do the summary differently when it knows
-the variable is a factor,
-
-``` r
-summary(female)
-```
-
-    ##   male female 
-    ##  95222 101363
+R will do the summary differently when it knows the variable is a
+factor,
 
 ``` r
-summary(PUMA)
+summary(EST_ST)
 ```
 
-    ##                   NYC-Bronx CD 8--Riverdale, Fieldston & Kingsbridge 
-    ##                                                                  936 
-    ##                NYC-Bronx CD 12--Wakefield, Williamsbridge & Woodlawn 
-    ##                                                                 1092 
-    ##              NYC-Bronx CD 10--Co-op City, Pelham Bay & Schuylerville 
-    ##                                                                  767 
-    ##               NYC-Bronx CD 11--Pelham Parkway, Morris Park & Laconia 
-    ##                                                                 1115 
-    ##        NYC-Bronx CD 3 & 6--Belmont, Crotona Park East & East Tremont 
-    ##                                                                 1311 
-    ##                NYC-Bronx CD 7--Bedford Park, Fordham North & Norwood 
-    ##                                                                  854 
-    ##           NYC-Bronx CD 5--Morris Heights, Fordham South & Mount Hope 
-    ##                                                                 1112 
-    ##                   NYC-Bronx CD 4--Concourse, Highbridge & Mount Eden 
-    ##                                                                  917 
-    ##              NYC-Bronx CD 9--Castle Hill, Clason Point & Parkchester 
-    ##                                                                 1307 
-    ##                  NYC-Bronx CD 1 & 2--Hunts Point, Longwood & Melrose 
-    ##                                                                 1166 
-    ##        NYC-Manhattan CD 12--Washington Heights, Inwood & Marble Hill 
-    ##                                                                 1238 
-    ##   NYC-Manhattan CD 9--Hamilton Heights, Manhattanville & West Harlem 
-    ##                                                                  872 
-    ##                                  NYC-Manhattan CD 10--Central Harlem 
-    ##                                                                  897 
-    ##                                     NYC-Manhattan CD 11--East Harlem 
-    ##                                                                  769 
-    ##                                  NYC-Manhattan CD 8--Upper East Side 
-    ##                                                                 1167 
-    ##                      NYC-Manhattan CD 7--Upper West Side & West Side 
-    ##                                                                  949 
-    ## NYC-Manhattan CD 4 & 5--Chelsea, Clinton & Midtown Business District 
-    ##                                                                  944 
-    ##          NYC-Manhattan CD 6--Murray Hill, Gramercy & Stuyvesant Town 
-    ##                                                                  758 
-    ##                      NYC-Manhattan CD 3--Chinatown & Lower East Side 
-    ##                                                                 1062 
-    ##  NYC-Manhattan CD 1 & 2--Battery Park City, Greenwich Village & Soho 
-    ##                                                                 1136 
-    ##          NYC-Staten Island CD 3--Tottenville, Great Kills & Annadale 
-    ##                                                                 1303 
-    ##                NYC-Staten Island CD 2--New Springville & South Beach 
-    ##                                                                 1173 
-    ##  NYC-Staten Island CD 1--Port Richmond, Stapleton & Mariner's Harbor 
-    ##                                                                 1621 
-    ##                         NYC-Brooklyn CD 1--Greenpoint & Williamsburg 
-    ##                                                                 1293 
-    ##                                          NYC-Brooklyn CD 4--Bushwick 
-    ##                                                                 1060 
-    ##                                NYC-Brooklyn CD 3--Bedford-Stuyvesant 
-    ##                                                                 1082 
-    ##                    NYC-Brooklyn CD 2--Brooklyn Heights & Fort Greene 
-    ##                                                                 1320 
-    ##            NYC-Brooklyn CD 6--Park Slope, Carroll Gardens & Red Hook 
-    ##                                                                 1168 
-    ##            NYC-Brooklyn CD 8--Crown Heights North & Prospect Heights 
-    ##                                                                 1077 
-    ##                         NYC-Brooklyn CD 16--Brownsville & Ocean Hill 
-    ##                                                                  904 
-    ##                     NYC-Brooklyn CD 5--East New York & Starrett City 
-    ##                                                                 1321 
-    ##                             NYC-Brooklyn CD 18--Canarsie & Flatlands 
-    ##                                                                 2422 
-    ##                  NYC-Brooklyn CD 17--East Flatbush, Farragut & Rugby 
-    ##                                                                 1250 
-    ##  NYC-Brooklyn CD 9--Crown Heights South, Prospect Lefferts & Wingate 
-    ##                                                                  818 
-    ##                     NYC-Brooklyn CD 7--Sunset Park & Windsor Terrace 
-    ##                                                                 1291 
-    ##                        NYC-Brooklyn CD 10--Bay Ridge & Dyker Heights 
-    ##                                                                 1519 
-    ##         NYC-Brooklyn CD 12--Borough Park, Kensington & Ocean Parkway 
-    ##                                                                 1698 
-    ##                               NYC-Brooklyn CD 14--Flatbush & Midwood 
-    ##                                                                 1479 
-    ##      NYC-Brooklyn CD 15--Sheepshead Bay, Gerritsen Beach & Homecrest 
-    ##                                                                 1903 
-    ##                         NYC-Brooklyn CD 11--Bensonhurst & Bath Beach 
-    ##                                                                 2234 
-    ##                    NYC-Brooklyn CD 13--Brighton Beach & Coney Island 
-    ##                                                                  925 
-    ##                          NYC-Queens CD 1--Astoria & Long Island City 
-    ##                                                                 1748 
-    ##                      NYC-Queens CD 3--Jackson Heights & North Corona 
-    ##                                                                 1316 
-    ##                  NYC-Queens CD 7--Flushing, Murray Hill & Whitestone 
-    ##                                                                 2290 
-    ##                  NYC-Queens CD 11--Bayside, Douglaston & Little Neck 
-    ##                                                                 1344 
-    ##         NYC-Queens CD 13--Queens Village, Cambria Heights & Rosedale 
-    ##                                                                 2148 
-    ##                NYC-Queens CD 8--Briarwood, Fresh Meadows & Hillcrest 
-    ##                                                                 1393 
-    ##                             NYC-Queens CD 4--Elmhurst & South Corona 
-    ##                                                                  973 
-    ##                            NYC-Queens CD 6--Forest Hills & Rego Park 
-    ##                                                                 1041 
-    ##                                NYC-Queens CD 2--Sunnyside & Woodside 
-    ##                                                                 1158 
-    ##                NYC-Queens CD 5--Ridgewood, Glendale & Middle Village 
-    ##                                                                 2040 
-    ##                           NYC-Queens CD 9--Richmond Hill & Woodhaven 
-    ##                                                                 1694 
-    ##                       NYC-Queens CD 12--Jamaica, Hollis & St. Albans 
-    ##                                                                 2438 
-    ##                          NYC-Queens CD 10--Howard Beach & Ozone Park 
-    ##                                                                 1304 
-    ##         NYC-Queens CD 14--Far Rockaway, Breezy Point & Broad Channel 
-    ##                                                                  954 
-    ##                                                                 NA's 
-    ##                                                               125514
+    ##              Alabama               Alaska              Arizona 
+    ##                  918                 1232                 1744 
+    ##             Arkansas           California             Colorado 
+    ##                  917                 5359                 1667 
+    ##          Connecticut             Delaware District of Columbia 
+    ##                 1229                  892                  761 
+    ##              Florida              Georgia               Hawaii 
+    ##                 2728                 1655                  812 
+    ##                Idaho             Illinois              Indiana 
+    ##                 1245                 1387                 1247 
+    ##                 Iowa               Kansas             Kentucky 
+    ##                  995                 1315                  938 
+    ##            Louisiana                Maine             Maryland 
+    ##                  895                  606                 1605 
+    ##        Massachusetts             Michigan            Minnesota 
+    ##                 1965                 1753                 1488 
+    ##          Mississippi             Missouri              Montana 
+    ##                  658                 1229                  695 
+    ##             Nebraska               Nevada        New Hampshire 
+    ##                  997                 1200                  970 
+    ##           New Jersey           New Mexico             New York 
+    ##                 1391                 1373                 1292 
+    ##       North Carolina         North Dakota                 Ohio 
+    ##                 1310                  449                 1030 
+    ##             Oklahoma               Oregon         Pennsylvania 
+    ##                  969                 1934                 1727 
+    ##         Rhode Island       South Carolina         South Dakota 
+    ##                  634                 1042                  628 
+    ##            Tennessee                Texas                 Utah 
+    ##                 1206                 3766                 1862 
+    ##              Vermont             Virginia           Washington 
+    ##                  664                 1740                 2634 
+    ##        West Virginia            Wisconsin              Wyoming 
+    ##                  680                 1133                  548
 
 ``` r
-summary(educ_indx)
+summary(INCOME)
 ```
 
-    ##  No HS     HS SmColl   Bach    Adv 
-    ##  53267  55119  34012  30802  23385
+    ##                       NA HH income less than $25k  HH income $25k - $34.9k 
+    ##                    14637                     5698                     4600 
+    ##    HH income $35k - 49.9    HH income $50k - 74.9     HH income $75 - 99.9 
+    ##                     5805                     9330                     7830 
+    ##    HH income $100k - 149     HH income $150 - 199        HH income $200k + 
+    ##                    10117                     4980                     6117
 
-To find mean and standard deviation by neighborhood, you could use
+I know, we’d like if household income were a regular number not a
+factor, but that’s what Census provides, as a way of helping keep
+confidentiality.
+
+To find mean and standard deviation of age by state, you could use
 something like this,
 
 ``` r
-ddply(acs2017_ny, .(PUMA), summarize, mean = round(mean(AGE), 2), sd = round(sd(AGE), 2), n_obsv = length(PUMA))
+ddply(Household_Pulse_data, .(EST_ST), summarize, mean = round(mean(2021 - TBIRTH_YEAR), 2), sd = round(sd(2021 - TBIRTH_YEAR), 2), n_obsv = length(EST_ST))
 ```
 
-    ##     PUMA  mean    sd n_obsv
-    ## 1    100 41.70 23.85   1819
-    ## 2    200 43.47 23.45   2624
-    ## 3    300 44.88 23.60   1724
-    ## 4    401 45.12 24.28   1597
-    ## 5    402 42.23 24.18   1774
-    ## 6    403 43.22 23.66   2202
-    ## 7    500 40.01 23.73   2214
-    ## 8    600 39.77 23.29   1670
-    ## 9    701 36.64 22.44   1692
-    ## 10   702 42.13 23.02   1265
-    ## 11   703 43.70 24.11   1945
-    ## 12   704 44.71 23.83   2043
-    ## 13   800 43.93 23.62   1871
-    ## 14   901 45.35 24.04   1288
-    ## 15   902 40.74 22.29   1126
-    ## 16   903 38.70 22.42    947
-    ## 17   904 43.70 23.84   1141
-    ## 18   905 40.84 22.75   1099
-    ## 19   906 41.48 24.26   1752
-    ## 20  1000 42.77 23.43   1536
-    ## 21  1101 44.33 24.22   1061
-    ## 22  1102 42.49 23.23   1153
-    ## 23  1201 44.28 24.74    952
-    ## 24  1202 42.72 24.68   1122
-    ## 25  1203 43.80 23.84    941
-    ## 26  1204 43.57 23.84   1701
-    ## 27  1205 40.35 23.50   1333
-    ## 28  1206 37.94 22.96   1112
-    ## 29  1207 45.42 23.92   1787
-    ## 30  1300 43.73 23.35   1885
-    ## 31  1400 43.80 24.01   1909
-    ## 32  1500 40.94 23.49   1914
-    ## 33  1600 43.30 24.68   1510
-    ## 34  1700 43.52 23.86   1407
-    ## 35  1801 42.63 23.60   1092
-    ## 36  1802 43.08 23.23   1356
-    ## 37  1900 42.81 23.57   1694
-    ## 38  2001 37.81 22.86    923
-    ## 39  2002 43.45 23.90   2030
-    ## 40  2100 46.88 23.54   1404
-    ## 41  2201 41.39 23.92   1311
-    ## 42  2202 44.64 23.67   1358
-    ## 43  2203 44.31 24.08   1950
-    ## 44  2300 37.97 22.08   1105
-    ## 45  2401 45.15 23.39   1109
-    ## 46  2402 42.78 24.42   2172
-    ## 47  2500 42.73 24.33   3051
-    ## 48  2600 43.71 24.47   2039
-    ## 49  2701 44.76 23.71   1118
-    ## 50  2702 42.69 23.16   1533
-    ## 51  2801 43.81 23.74   1542
-    ## 52  2802 43.19 23.91   1620
-    ## 53  2901 41.72 23.03   1042
-    ## 54  2902 42.99 22.82   1195
-    ## 55  2903 34.24 23.39   1323
-    ## 56  3001 44.04 23.76    965
-    ## 57  3002 42.34 24.24    943
-    ## 58  3003 32.23 24.23   1232
-    ## 59  3101 43.50 22.72    959
-    ## 60  3102 43.58 23.51   1341
-    ## 61  3103 43.50 23.89   1283
-    ## 62  3104 39.12 23.54   1093
-    ## 63  3105 42.69 24.40   1679
-    ## 64  3106 42.68 23.85   1518
-    ## 65  3107 42.05 23.57   1762
-    ## 66  3201 43.25 25.02   1543
-    ## 67  3202 44.08 24.19   1376
-    ## 68  3203 43.40 24.06   1013
-    ## 69  3204 43.77 23.56   1267
-    ## 70  3205 42.64 23.83   1215
-    ## 71  3206 40.57 23.55   1207
-    ## 72  3207 42.79 24.08   1076
-    ## 73  3208 43.68 23.96   1188
-    ## 74  3209 43.11 23.37   1021
-    ## 75  3210 42.34 23.58    987
-    ## 76  3211 41.49 22.93    968
-    ## 77  3212 44.51 25.12    962
-    ## 78  3301 45.37 24.21    934
-    ## 79  3302 43.40 24.24   1018
-    ## 80  3303 43.01 24.03   1279
-    ## 81  3304 41.35 23.85   1268
-    ## 82  3305 48.60 24.31   1326
-    ## 83  3306 43.79 22.92   1097
-    ## 84  3307 41.86 22.68    881
-    ## 85  3308 41.31 23.04   1131
-    ## 86  3309 43.69 23.07    948
-    ## 87  3310 39.30 22.38    975
-    ## 88  3311 40.25 23.23   1036
-    ## 89  3312 40.43 22.31    974
-    ## 90  3313 40.90 23.82    966
-    ## 91  3701 43.12 25.58    936
-    ## 92  3702 40.22 22.96   1092
-    ## 93  3703 43.63 24.07    767
-    ## 94  3704 42.05 24.57   1115
-    ## 95  3705 34.78 22.47   1311
-    ## 96  3706 35.15 22.40    854
-    ## 97  3707 33.70 22.15   1112
-    ## 98  3708 35.25 22.01    917
-    ## 99  3709 38.88 23.99   1307
-    ## 100 3710 35.34 22.09   1166
-    ## 101 3801 40.55 22.58   1238
-    ## 102 3802 35.62 20.80    872
-    ## 103 3803 39.45 21.16    897
-    ## 104 3804 38.39 21.37    769
-    ## 105 3805 43.53 23.63   1167
-    ## 106 3806 42.44 22.85    949
-    ## 107 3807 40.20 19.30    944
-    ## 108 3808 40.66 21.37    758
-    ## 109 3809 40.98 22.18   1062
-    ## 110 3810 39.03 20.90   1136
-    ## 111 3901 42.89 23.76   1303
-    ## 112 3902 41.08 23.88   1173
-    ## 113 3903 40.75 22.72   1621
-    ## 114 4001 35.39 20.42   1293
-    ## 115 4002 34.12 19.37   1060
-    ## 116 4003 36.03 20.78   1082
-    ## 117 4004 36.75 20.23   1320
-    ## 118 4005 36.84 20.31   1168
-    ## 119 4006 38.50 20.69   1077
-    ## 120 4007 39.63 21.48    904
-    ## 121 4008 36.65 22.17   1321
-    ## 122 4009 41.51 23.14   2422
-    ## 123 4010 42.14 23.08   1250
-    ## 124 4011 39.77 22.98    818
-    ## 125 4012 36.75 21.46   1291
-    ## 126 4013 42.91 22.97   1519
-    ## 127 4014 35.35 24.37   1698
-    ## 128 4015 38.65 23.33   1479
-    ## 129 4016 42.18 24.11   1903
-    ## 130 4017 39.67 22.74   2234
-    ## 131 4018 45.54 24.77    925
-    ## 132 4101 38.65 20.21   1748
-    ## 133 4102 38.72 22.55   1316
-    ## 134 4103 44.60 23.11   2290
-    ## 135 4104 45.76 23.24   1344
-    ## 136 4105 41.99 23.29   2148
-    ## 137 4106 40.17 23.88   1393
-    ## 138 4107 40.09 21.87    973
-    ## 139 4108 42.64 23.42   1041
-    ## 140 4109 41.20 20.83   1158
-    ## 141 4110 40.21 22.13   2040
-    ## 142 4111 40.69 21.64   1694
-    ## 143 4112 40.37 22.80   2438
-    ## 144 4113 39.78 22.77   1304
-    ## 145 4114 39.47 24.25    954
+    ##                  EST_ST  mean    sd n_obsv
+    ## 1               Alabama 52.93 16.24    918
+    ## 2                Alaska 51.21 15.92   1232
+    ## 3               Arizona 54.70 16.09   1744
+    ## 4              Arkansas 52.31 15.76    917
+    ## 5            California 52.94 15.92   5359
+    ## 6              Colorado 52.31 15.93   1667
+    ## 7           Connecticut 53.95 15.87   1229
+    ## 8              Delaware 55.45 15.64    892
+    ## 9  District of Columbia 53.85 15.24    761
+    ## 10              Florida 56.24 15.93   2728
+    ## 11              Georgia 53.19 15.32   1655
+    ## 12               Hawaii 54.28 16.45    812
+    ## 13                Idaho 52.78 16.22   1245
+    ## 14             Illinois 52.11 16.26   1387
+    ## 15              Indiana 52.08 15.58   1247
+    ## 16                 Iowa 53.83 15.63    995
+    ## 17               Kansas 51.33 16.27   1315
+    ## 18             Kentucky 53.57 15.51    938
+    ## 19            Louisiana 51.96 15.24    895
+    ## 20                Maine 54.61 15.26    606
+    ## 21             Maryland 53.18 15.72   1605
+    ## 22        Massachusetts 54.11 15.73   1965
+    ## 23             Michigan 54.72 15.70   1753
+    ## 24            Minnesota 51.35 16.04   1488
+    ## 25          Mississippi 52.76 15.54    658
+    ## 26             Missouri 53.84 16.11   1229
+    ## 27              Montana 53.70 15.58    695
+    ## 28             Nebraska 52.14 16.12    997
+    ## 29               Nevada 53.86 15.86   1200
+    ## 30        New Hampshire 56.08 15.38    970
+    ## 31           New Jersey 54.14 15.14   1391
+    ## 32           New Mexico 55.23 15.63   1373
+    ## 33             New York 51.73 16.23   1292
+    ## 34       North Carolina 53.27 15.74   1310
+    ## 35         North Dakota 52.04 15.64    449
+    ## 36                 Ohio 53.65 15.56   1030
+    ## 37             Oklahoma 53.31 15.54    969
+    ## 38               Oregon 51.47 16.14   1934
+    ## 39         Pennsylvania 52.43 16.26   1727
+    ## 40         Rhode Island 54.18 15.36    634
+    ## 41       South Carolina 55.14 16.05   1042
+    ## 42         South Dakota 52.69 15.84    628
+    ## 43            Tennessee 51.85 16.51   1206
+    ## 44                Texas 52.15 16.05   3766
+    ## 45                 Utah 47.97 16.20   1862
+    ## 46              Vermont 56.61 15.13    664
+    ## 47             Virginia 53.37 15.22   1740
+    ## 48           Washington 53.06 15.75   2634
+    ## 49        West Virginia 54.32 15.48    680
+    ## 50            Wisconsin 52.40 15.95   1133
+    ## 51              Wyoming 54.62 15.03    548
 
 Although tapply would also work fine.
 
-Here’s the 90th and 10th percentiles of wages by neighborhood,
+Here’s the 90th and 10th percentiles of age by state,
 
 ``` r
-dat_use1 <- subset(acs2017_ny,((INCWAGE > 0) & in_NYC))
-ddply(dat_use1, .(PUMA), summarize, inc90 = quantile(INCWAGE,probs = 0.9), inc10 = quantile(INCWAGE,probs = 0.1), n_obs = length(INCWAGE))
+ddply(Household_Pulse_data, .(EST_ST), summarize, age90th = quantile((2021 - TBIRTH_YEAR),probs = 0.9), age10th = quantile((2021 - TBIRTH_YEAR),probs = 0.1), n_obs = length(TBIRTH_YEAR))
 ```
 
-    ##    PUMA  inc90 inc10 n_obs
-    ## 1  3701 120000  3220   424
-    ## 2  3702  85000  6700   541
-    ## 3  3703 100500  3750   366
-    ## 4  3704  90000  6980   510
-    ## 5  3705  52000  3000   537
-    ## 6  3706  63200  5940   359
-    ## 7  3707  60000  4000   439
-    ## 8  3708  62000  6000   376
-    ## 9  3709  78800  5220   503
-    ## 10 3710  55000  3580   420
-    ## 11 3801 100000  5000   670
-    ## 12 3802 120000  3000   399
-    ## 13 3803 130000  6000   478
-    ## 14 3804 120000  7000   368
-    ## 15 3805 300000 17900   636
-    ## 16 3806 326000  7860   509
-    ## 17 3807 268000 10000   635
-    ## 18 3808 300000 20560   460
-    ## 19 3809 140000  5000   515
-    ## 20 3810 300000  6000   695
-    ## 21 3901 127000  6220   617
-    ## 22 3902 125000  8000   524
-    ## 23 3903 100000  7100   771
-    ## 24 4001 149500 10000   736
-    ## 25 4002  82000  9000   581
-    ## 26 4003 110000  7200   557
-    ## 27 4004 166000  7000   786
-    ## 28 4005 200000 12000   681
-    ## 29 4006 114000  8740   585
-    ## 30 4007  79000  4800   361
-    ## 31 4008  73000  6000   549
-    ## 32 4009 100000  9600  1178
-    ## 33 4010  80200  8360   610
-    ## 34 4011  95400  7000   407
-    ## 35 4012 102200  6880   625
-    ## 36 4013 124000  7440   773
-    ## 37 4014  90000  5590   654
-    ## 38 4015 100000  7450   710
-    ## 39 4016 101200  6000   899
-    ## 40 4017  97000  7200  1070
-    ## 41 4018 100000  5000   368
-    ## 42 4101 104000  9600  1041
-    ## 43 4102  82400  8000   624
-    ## 44 4103 100000  7180  1107
-    ## 45 4104 110000  8000   661
-    ## 46 4105 100000  7000  1080
-    ## 47 4106 102000  8000   641
-    ## 48 4107  70000  8000   499
-    ## 49 4108 140000 10000   563
-    ## 50 4109 129600 11600   655
-    ## 51 4110 100000 10000  1049
-    ## 52 4111  90000  8680   865
-    ## 53 4112  84800  7260  1213
-    ## 54 4113  93000  6000   625
-    ## 55 4114 108300  6700   378
+    ##                  EST_ST age90th age10th n_obs
+    ## 1               Alabama    74.0    30.0   918
+    ## 2                Alaska    71.0    30.0  1232
+    ## 3               Arizona    75.0    32.0  1744
+    ## 4              Arkansas    73.0    31.0   917
+    ## 5            California    74.0    31.0  5359
+    ## 6              Colorado    73.0    31.0  1667
+    ## 7           Connecticut    74.0    32.0  1229
+    ## 8              Delaware    74.9    33.0   892
+    ## 9  District of Columbia    74.0    34.0   761
+    ## 10              Florida    76.0    34.0  2728
+    ## 11              Georgia    74.0    32.0  1655
+    ## 12               Hawaii    74.0    31.0   812
+    ## 13                Idaho    75.0    31.0  1245
+    ## 14             Illinois    73.0    30.0  1387
+    ## 15              Indiana    72.0    31.0  1247
+    ## 16                 Iowa    73.0    33.0   995
+    ## 17               Kansas    72.0    29.0  1315
+    ## 18             Kentucky    72.3    32.0   938
+    ## 19            Louisiana    72.0    31.0   895
+    ## 20                Maine    73.0    32.5   606
+    ## 21             Maryland    74.0    32.4  1605
+    ## 22        Massachusetts    74.0    32.0  1965
+    ## 23             Michigan    74.0    33.0  1753
+    ## 24            Minnesota    72.0    30.0  1488
+    ## 25          Mississippi    73.0    32.0   658
+    ## 26             Missouri    75.0    32.0  1229
+    ## 27              Montana    74.0    32.0   695
+    ## 28             Nebraska    74.0    31.0   997
+    ## 29               Nevada    74.0    32.0  1200
+    ## 30        New Hampshire    75.0    33.9   970
+    ## 31           New Jersey    73.0    34.0  1391
+    ## 32           New Mexico    74.0    33.0  1373
+    ## 33             New York    73.0    30.0  1292
+    ## 34       North Carolina    73.0    32.0  1310
+    ## 35         North Dakota    71.0    32.0   449
+    ## 36                 Ohio    73.0    32.0  1030
+    ## 37             Oklahoma    73.0    33.0   969
+    ## 38               Oregon    73.0    30.0  1934
+    ## 39         Pennsylvania    73.0    31.0  1727
+    ## 40         Rhode Island    73.0    33.0   634
+    ## 41       South Carolina    75.0    32.0  1042
+    ## 42         South Dakota    72.0    32.0   628
+    ## 43            Tennessee    73.0    29.0  1206
+    ## 44                Texas    73.0    30.0  3766
+    ## 45                 Utah    71.0    28.0  1862
+    ## 46              Vermont    74.7    36.0   664
+    ## 47             Virginia    73.0    33.0  1740
+    ## 48           Washington    74.0    32.0  2634
+    ## 49        West Virginia    72.1    32.0   680
+    ## 50            Wisconsin    73.0    31.0  1133
+    ## 51              Wyoming    73.0    35.0   548
 
 You could also use table (or crosstabs) for factors with fewer items,
 
 ``` r
-table(educ_indx,female)
+table(EEDUC,GENID_DESCRIBE)
 ```
 
-    ##          female
-    ## educ_indx  male female
-    ##    No HS  27180  26087
-    ##    HS     27309  27810
-    ##    SmColl 15847  18165
-    ##    Bach   14632  16170
-    ##    Adv    10254  13131
+    ##               GENID_DESCRIBE
+    ## EEDUC             NA  male female transgender other
+    ##   less than hs    14   158    204          11    24
+    ##   some hs         25   379    505           7    20
+    ##   HS diploma     154  2844   4734          28    97
+    ##   some coll      207  5569   8607          53   160
+    ##   assoc deg      124  2447   4835          15    87
+    ##   bach deg       319  8143  11401          46   166
+    ##   adv deg        288  7256   9977          42   168
 
 ``` r
-xtabs(~educ_indx + female)
+xtabs(~EEDUC + GENID_DESCRIBE)
 ```
 
-    ##          female
-    ## educ_indx  male female
-    ##    No HS  27180  26087
-    ##    HS     27309  27810
-    ##    SmColl 15847  18165
-    ##    Bach   14632  16170
-    ##    Adv    10254  13131
+    ##               GENID_DESCRIBE
+    ## EEDUC             NA  male female transgender other
+    ##   less than hs    14   158    204          11    24
+    ##   some hs         25   379    505           7    20
+    ##   HS diploma     154  2844   4734          28    97
+    ##   some coll      207  5569   8607          53   160
+    ##   assoc deg      124  2447   4835          15    87
+    ##   bach deg       319  8143  11401          46   166
+    ##   adv deg        288  7256   9977          42   168
 
 Want proportions instead of counts?
 
 ``` r
-prop.table(table(educ_indx,female))
+prop.table(table(EEDUC,GENID_DESCRIBE))
 ```
 
-    ##          female
-    ## educ_indx       male     female
-    ##    No HS  0.13826080 0.13270087
-    ##    HS     0.13891701 0.14146552
-    ##    SmColl 0.08061144 0.09240278
-    ##    Bach   0.07443091 0.08225450
-    ##    Adv    0.05216064 0.06679553
+    ##               GENID_DESCRIBE
+    ## EEDUC                    NA         male       female  transgender        other
+    ##   less than hs 0.0002025639 0.0022860781 0.0029516451 0.0001591573 0.0003472524
+    ##   some hs      0.0003617212 0.0054836936 0.0073067685 0.0001012819 0.0002893770
+    ##   HS diploma   0.0022282027 0.0411494053 0.0684955291 0.0004051278 0.0014034783
+    ##   some coll    0.0029950517 0.0805770177 0.1245333796 0.0007668490 0.0023150158
+    ##   assoc deg    0.0017941372 0.0354052724 0.0699568828 0.0002170327 0.0012587898
+    ##   bach deg     0.0046155627 0.1178198339 0.1649593425 0.0006655670 0.0024018289
+    ##   adv deg      0.0041670284 0.1049859652 0.1443557022 0.0006076916 0.0024307666
 
 *Remember prop.table later when we do marginals.*
 
-Try it and see what happens if you use table with PUMA…
+Try it and see what happens if you use table with EST_ST…
 
-This data includes not just whether a person has a college degree but
-also what field was the degree in: Economics or Psychology, for
-instance. Look over the codebook about DEGFIELD and DEGFIELDD (that
-second D means more detail) to see the codes. Maybe look at 10th and
-90th percentiles by degree field?
+### Alt versions
 
 In general, R is very flexible so there are often many different ways to
 get the same answer. There are some people who love to debate which is
@@ -637,74 +363,26 @@ the intro texts suggest one or the other.
 If you do a lot of analysis on a particular subgroup, it might be
 worthwhile to create a subset of that group, so that you don’t have to
 always add on logical conditions. These two sets of expressions, looking
-at “prime-age” people, get the same results:
+at people in the Northeast, get the same results:
 
 ``` r
-mean(educ_nohs[(AGE >= 25)&(AGE <= 55)])
+mean(TBIRTH_YEAR[(REGION == "Northeast")])
 ```
 
-    ## [1] 0.08354656
-
-``` r
-mean(educ_hs[(AGE >= 25)&(AGE <= 55)])
-```
-
-    ## [1] 0.2974594
-
-``` r
-mean(educ_somecoll[(AGE >= 25)&(AGE <= 55)])
-```
-
-    ## [1] 0.2057843
-
-``` r
-mean(educ_college[(AGE >= 25)&(AGE <= 55)])
-```
-
-    ## [1] 0.2383112
-
-``` r
-mean(educ_advdeg[(AGE >= 25)&(AGE <= 55)])
-```
-
-    ## [1] 0.1748986
+    ## [1] 1967.101
 
 ``` r
 # alternatively
-restrict1 <- as.logical((AGE >= 25)&(AGE <= 55))
-dat_age_primeage <- subset(acs2017_ny, restrict1)
+restrict1 <- as.logical((REGION == "Northeast"))
+dat_northeast <- subset(Household_Pulse_data, restrict1)
 
 detach()
-attach(dat_age_primeage)
+attach(dat_northeast)
 
-mean(educ_nohs)
+mean(TBIRTH_YEAR)
 ```
 
-    ## [1] 0.08354656
-
-``` r
-mean(educ_hs)
-```
-
-    ## [1] 0.2974594
-
-``` r
-mean(educ_somecoll)
-```
-
-    ## [1] 0.2057843
-
-``` r
-mean(educ_college)
-```
-
-    ## [1] 0.2383112
-
-``` r
-mean(educ_advdeg)
-```
-
-    ## [1] 0.1748986
+    ## [1] 1967.101
 
 ``` r
 detach()
@@ -714,26 +392,26 @@ So you detach the original data frame and instead attach the restricted
 version. Then any subsequent analysis would be just done on that subset.
 Just remember that you’ve done this (again, this is a good reason to
 save the commands in a program so you can look back) otherwise you’ll
-wonder why you suddenly don’t have any kids in the sample\!
+wonder why you suddenly don’t have southerners in the sample!
+
+Obviously for a single restriction that might not be worthwhile but
+later you might have more complicated propositions.
 
 ## Why All These Details?
 
 You might be tired and bored by these details, but note that there are
 actually important choices to be made here, even in simply defining
 variables. Take the fraught American category of “race”. This data has a
-variable, RACED, showing how people chose to classify themselves, as
-‘White,’ ‘Black,’ ‘American Indian,’ ‘Asian,’ various combinations,
-and many more codes.
+variable, RRACE, showing how people chose to classify themselves, as
+‘White,’ ‘Black,’ ‘Asian,’ or other.
 
-Suppose you wanted to find out how many Asians are in a particular
-population. You could count how many people identify themselves as Asian
-only; you could count how many people identify as Asian in any
-combination. Sometimes the choice is irrelevant; sometimes it can skew
-the final results (e.g. the question in some areas, are there more
-African-Americans or more Hispanics?).
+In this case the Census has chosen particular values while alternate
+responses go into the category of “Other”. In this case that was done
+for confidentiality, just like the measures of income. Other government
+data has more detail.
 
-Again, there’s no “right” way to do it because there’s no science in
-this peculiar-but-popular concept of “race”. People’s conceptions of
+There’s no “right” way to do it because there’s no science in this
+peculiar-but-popular concept of “race”. People’s conceptions of
 themselves are fuzzy and complicated; these measures are approximations.
 
 ## Basics of government race/ethnicity classification
@@ -745,36 +423,28 @@ by how we think that other people think of us…). Currently the standard
 classification asks people separately about their “race” and “ethnicity”
 where people can pick labels from each category in any combination.
 
-The “race” categories include: “White,” “African-American,” “American
-Indian,” “Asian,” and others. Then the supplemental race categories
-offer more detail.
-
-These are a peculiar combination of very general (well over 40% of the
-world’s population is “Asian”) and very specific (“American Indian” has
-fewer) representing a peculiar history of popular attitudes in the US.
-Only in the 2000 Census did they start to classify people in mixed
-races. If you were to go back to historical US Censuses from more than a
-century ago, you would find that the category “race” included separate
-entries for Irish and French. Stephen J Gould has a fascinating book,
-The Mismeasure of Man, discussing how early scientific classifications
-of humans tried to “prove” which nationalities/races/groups were the
-smartest. Ta-Nehisi Coates notes, “racism invented race in America.”
-Throughout history, statistics have been used to try to prove peoples’
-prejudices.
+The “race” categories include: “White,” “Black,” “Asian,” and others.
+These represent a recent history of popular attitudes in the US. Only in
+the 2000 Census did they start to classify people in mixed races. If you
+were to go back to historical US Censuses from more than a century ago,
+you would find that the category “race” included separate entries for
+Irish and French. Stephen J Gould has a fascinating book, The Mismeasure
+of Man, discussing how early scientific classifications of humans tried
+to “prove” which nationalities/races/groups were the smartest. Ta-Nehisi
+Coates notes, “racism invented race in America.” Throughout history,
+statistics have been used to try to prove peoples’ prejudices.
 
 Note that “Hispanic” is not “race” but rather ethnicity (includes
 various other labels such as Spanish, Latino, etc.). So a respondent
 could choose “Hispanic” and any race category – some choose “White,”
-some choose “African American,” some might be combined with any other of
-those complicated racial categories.
+some choose “Black” or “Asian” or “Other”.
 
 If you wanted to create a variable for those who report themselves as
-African-American and Hispanic, you’d use the expression (AfAm == 1) &
-(Hispanic == 1); sometimes government stats report for non-Hispanic
-whites so (white == 1) & (Hispanic \!= 1). You can create your own
-classifications depending on what questions you’re investigating. This
-data includes items on birthplace and ancestry (more detail on
-relatives\!).
+Black and Hispanic, you’d use the expression (RRACE == “Black) &
+(RHISPANIC ==”Hispanic”); sometimes government stats report for
+non-Hispanic whites so (RRACE == “White”) & (RHISPANIC != “Hispanic”).
+You can create your own classifications depending on what questions
+you’re investigating.
 
 The Census Bureau gives more information
 [here](http://www.census.gov/newsroom/minority_links/minority_links.html).
@@ -793,16 +463,11 @@ a statistical analysis spends a lot of time doing this sort of
 housekeeping - dull but necessary. It has a variety of names: data
 carpentry, data munging…
 
-Educational attainment is also classified with complicated codes in this
-data: the original data has code 63 to mean high school diploma, 64 for
-a GED, 65 for less than a year of college, etc. I have transformed them
-into a series of dummy variables, zero/one variables for whether a
-person has no high school diploma, just a high school diploma, some
-college, a bachelor’s degree, or an advanced degree. As with race, there
-is no rule that you must always do it thus. Your own analysis might be
-different. (Is it valid to lump together everybody who lacks a high
-school diploma, no matter whether they completed just first grade or up
-to 12th?)
+For instance this data provides detail about gender id and sexual
+orientation but summary shows that “NA” is a common classification. They
+force EGENID_BIRTH to be binary. Depending on what questions you’re
+posing, you might want to combine together the 3 different responses NA,
+transgender, and other. Or you might not!
 
 That’s the whole point of learning to do the data work for yourself: you
 can see all of the little decisions that go into creating a conclusion.
@@ -815,7 +480,7 @@ find out.
 Without a doubt, programming is tough. In R or with any other program,
 it is frustrating and complicated and difficult to do it the first few
 times. Some days it feels like a continuous battle just to do the
-simplest thing\! Keep going despite that, keep working on it.
+simplest thing! Keep going despite that, keep working on it.
 
 Your study group will be very helpful of course.
 
@@ -832,9 +497,9 @@ cathartic but is not actually useful to anyone. If you email me with the
 minimal code that recreates the error, along with the text of the error
 and/or a screenshot, then that will help more.
 
-\#\#Do it The first homework assignment asks you to start working on
-these questions. Begin by running the code that I give here, just to see
-if you can replicate my results. Then start asking more questions about
-the data - there is so much info there\! Immigration/ancestry status,
-how they commute, health insurance, poverty, income, owner or renter
-(and how much they pay\!), all sorts of info. Have some fun.
+## Do it
+
+The first homework assignment asks you to start working on these
+questions. Begin by running the code that I give here, just to see if
+you can replicate my results. Then start asking more questions about the
+data - there is so much info there! Have some fun.
