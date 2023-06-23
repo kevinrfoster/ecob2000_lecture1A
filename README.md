@@ -18,22 +18,22 @@ hist(TBIRTH_YEAR[(TBIRTH_YEAR < 1950)])
 ![](lecture_1A_HHPulse_files/figure-gfm/unnamed-chunk-2-1.png)<!-- -->
 
 There is a bit of weirdness in the left, where it looks like there are
-suddenly a bunch of people who were born in 1933 but nobody in 1932 or
-earlier. This is due to a coding choice by the Census, where really old
-people are labeled as born in “1933” (top-coding) but it actually should
-be interpreted as meaning “in 1933 or before”. So if you were to get
+suddenly a bunch of people who were born in 1935 but many fewer in 1936
+or 1938. This is due to a coding choice by the Census, where really old
+people are labeled as born in “1935” (top-coding) but it actually should
+be interpreted as meaning “in 1935 or before”. So if you were to get
 finicky (and every good statistician is!) you might go back to the
 calculations of averages previously and modify them all. For instance,
-to select just those who are female and who are coded as having age less
-than 90. Many variables are topcoded! *And recall that topcoding
+to select just those who are female and who are coded as having birth
+year after 1935. Many variables are topcoded! *And recall that topcoding
 wouldn’t change the median values calculated before, which is a point in
 favor of that statistic.*
 
 ``` r
-mean(TBIRTH_YEAR[ (GENID_DESCRIBE == "female") & (TBIRTH_YEAR > 1933) ]) 
+mean(TBIRTH_YEAR[ (GENID_DESCRIBE == "female") & (TBIRTH_YEAR > 1935) ]) 
 ```
 
-    ## [1] 1968.792
+    ## [1] 1971.578
 
 You go make those other changes, figure out how top-coding changes the
 calculations of average age by gender – I’ll wait right here…
@@ -67,9 +67,9 @@ summary(EEDUC)
 ```
 
     ## less than hs      some hs   HS diploma    some coll    assoc deg     bach deg 
-    ##          411          936         7857        14596         7508        20075 
+    ##          435          911         7583        12638         6118        16668 
     ##      adv deg 
-    ##        17731
+    ##        14937
 
 R helpfully provides labels for each of those all together. Later when
 we get into more depth, we might have to dig into the y/n answers that
@@ -127,50 +127,50 @@ summary(EST_ST)
 ```
 
     ##              Alabama               Alaska              Arizona 
-    ##                  918                 1232                 1744 
+    ##                  798                  717                 1600 
     ##             Arkansas           California             Colorado 
-    ##                  917                 5359                 1667 
+    ##                  823                 4066                 1499 
     ##          Connecticut             Delaware District of Columbia 
-    ##                 1229                  892                  761 
+    ##                  903                  658                  790 
     ##              Florida              Georgia               Hawaii 
-    ##                 2728                 1655                  812 
+    ##                 1977                 1477                  619 
     ##                Idaho             Illinois              Indiana 
-    ##                 1245                 1387                 1247 
+    ##                 1344                 1324                 1031 
     ##                 Iowa               Kansas             Kentucky 
-    ##                  995                 1315                  938 
+    ##                  987                 1124                  898 
     ##            Louisiana                Maine             Maryland 
-    ##                  895                  606                 1605 
+    ##                  772                  694                 1283 
     ##        Massachusetts             Michigan            Minnesota 
-    ##                 1965                 1753                 1488 
+    ##                 1410                 1661                 1319 
     ##          Mississippi             Missouri              Montana 
-    ##                  658                 1229                  695 
+    ##                  756                  989                  815 
     ##             Nebraska               Nevada        New Hampshire 
-    ##                  997                 1200                  970 
+    ##                 1041                  887                  907 
     ##           New Jersey           New Mexico             New York 
-    ##                 1391                 1373                 1292 
+    ##                 1051                 1186                 1038 
     ##       North Carolina         North Dakota                 Ohio 
-    ##                 1310                  449                 1030 
+    ##                 1003                  595                  957 
     ##             Oklahoma               Oregon         Pennsylvania 
-    ##                  969                 1934                 1727 
+    ##                  953                 1451                 1418 
     ##         Rhode Island       South Carolina         South Dakota 
-    ##                  634                 1042                  628 
+    ##                  556                  848                  708 
     ##            Tennessee                Texas                 Utah 
-    ##                 1206                 3766                 1862 
+    ##                 1032                 2841                 1529 
     ##              Vermont             Virginia           Washington 
-    ##                  664                 1740                 2634 
+    ##                  647                 1496                 2323 
     ##        West Virginia            Wisconsin              Wyoming 
-    ##                  680                 1133                  548
+    ##                  718                 1088                  683
 
 ``` r
 summary(INCOME)
 ```
 
     ##                       NA HH income less than $25k  HH income $25k - $34.9k 
-    ##                    14637                     5698                     4600 
+    ##                    10833                     4764                     3811 
     ##    HH income $35k - 49.9    HH income $50k - 74.9     HH income $75 - 99.9 
-    ##                     5805                     9330                     7830 
+    ##                     5147                     7959                     6719 
     ##    HH income $100k - 149     HH income $150 - 199        HH income $200k + 
-    ##                    10117                     4980                     6117
+    ##                     9131                     4742                     6184
 
 I know, we’d like if household income were a regular number not a
 factor, but that’s what Census provides, as a way of helping keep
@@ -180,122 +180,123 @@ To find mean and standard deviation of age by state, you could use
 something like this,
 
 ``` r
-ddply(Household_Pulse_data, .(EST_ST), summarize, mean = round(mean(2021 - TBIRTH_YEAR), 2), sd = round(sd(2021 - TBIRTH_YEAR), 2), n_obsv = length(EST_ST))
+ddply(Household_Pulse_data, .(EST_ST), summarize, mean = round(mean(2023 - TBIRTH_YEAR), 2), sd = round(sd(2023 - TBIRTH_YEAR), 2), n_obsv = length(EST_ST))
 ```
 
     ##                  EST_ST  mean    sd n_obsv
-    ## 1               Alabama 52.93 16.24    918
-    ## 2                Alaska 51.21 15.92   1232
-    ## 3               Arizona 54.70 16.09   1744
-    ## 4              Arkansas 52.31 15.76    917
-    ## 5            California 52.94 15.92   5359
-    ## 6              Colorado 52.31 15.93   1667
-    ## 7           Connecticut 53.95 15.87   1229
-    ## 8              Delaware 55.45 15.64    892
-    ## 9  District of Columbia 53.85 15.24    761
-    ## 10              Florida 56.24 15.93   2728
-    ## 11              Georgia 53.19 15.32   1655
-    ## 12               Hawaii 54.28 16.45    812
-    ## 13                Idaho 52.78 16.22   1245
-    ## 14             Illinois 52.11 16.26   1387
-    ## 15              Indiana 52.08 15.58   1247
-    ## 16                 Iowa 53.83 15.63    995
-    ## 17               Kansas 51.33 16.27   1315
-    ## 18             Kentucky 53.57 15.51    938
-    ## 19            Louisiana 51.96 15.24    895
-    ## 20                Maine 54.61 15.26    606
-    ## 21             Maryland 53.18 15.72   1605
-    ## 22        Massachusetts 54.11 15.73   1965
-    ## 23             Michigan 54.72 15.70   1753
-    ## 24            Minnesota 51.35 16.04   1488
-    ## 25          Mississippi 52.76 15.54    658
-    ## 26             Missouri 53.84 16.11   1229
-    ## 27              Montana 53.70 15.58    695
-    ## 28             Nebraska 52.14 16.12    997
-    ## 29               Nevada 53.86 15.86   1200
-    ## 30        New Hampshire 56.08 15.38    970
-    ## 31           New Jersey 54.14 15.14   1391
-    ## 32           New Mexico 55.23 15.63   1373
-    ## 33             New York 51.73 16.23   1292
-    ## 34       North Carolina 53.27 15.74   1310
-    ## 35         North Dakota 52.04 15.64    449
-    ## 36                 Ohio 53.65 15.56   1030
-    ## 37             Oklahoma 53.31 15.54    969
-    ## 38               Oregon 51.47 16.14   1934
-    ## 39         Pennsylvania 52.43 16.26   1727
-    ## 40         Rhode Island 54.18 15.36    634
-    ## 41       South Carolina 55.14 16.05   1042
-    ## 42         South Dakota 52.69 15.84    628
-    ## 43            Tennessee 51.85 16.51   1206
-    ## 44                Texas 52.15 16.05   3766
-    ## 45                 Utah 47.97 16.20   1862
-    ## 46              Vermont 56.61 15.13    664
-    ## 47             Virginia 53.37 15.22   1740
-    ## 48           Washington 53.06 15.75   2634
-    ## 49        West Virginia 54.32 15.48    680
-    ## 50            Wisconsin 52.40 15.95   1133
-    ## 51              Wyoming 54.62 15.03    548
+    ## 1               Alabama 50.89 15.58    798
+    ## 2                Alaska 52.63 15.21    717
+    ## 3               Arizona 54.24 16.74   1600
+    ## 4              Arkansas 51.74 15.93    823
+    ## 5            California 52.08 15.74   4066
+    ## 6              Colorado 51.33 16.13   1499
+    ## 7           Connecticut 51.96 15.53    903
+    ## 8              Delaware 55.96 15.48    658
+    ## 9  District of Columbia 49.59 15.47    790
+    ## 10              Florida 54.78 16.25   1977
+    ## 11              Georgia 51.82 15.57   1477
+    ## 12               Hawaii 56.62 15.82    619
+    ## 13                Idaho 51.84 15.94   1344
+    ## 14             Illinois 50.86 15.73   1324
+    ## 15              Indiana 50.45 16.13   1031
+    ## 16                 Iowa 52.05 15.88    987
+    ## 17               Kansas 51.84 15.93   1124
+    ## 18             Kentucky 52.04 16.10    898
+    ## 19            Louisiana 52.77 16.12    772
+    ## 20                Maine 54.62 15.04    694
+    ## 21             Maryland 52.68 15.36   1283
+    ## 22        Massachusetts 50.59 15.83   1410
+    ## 23             Michigan 52.24 15.72   1661
+    ## 24            Minnesota 51.53 15.70   1319
+    ## 25          Mississippi 52.81 16.17    756
+    ## 26             Missouri 51.15 16.32    989
+    ## 27              Montana 52.04 16.06    815
+    ## 28             Nebraska 50.95 16.00   1041
+    ## 29               Nevada 53.90 15.67    887
+    ## 30        New Hampshire 53.80 15.31    907
+    ## 31           New Jersey 52.27 15.18   1051
+    ## 32           New Mexico 54.64 16.03   1186
+    ## 33             New York 49.44 15.95   1038
+    ## 34       North Carolina 52.62 16.56   1003
+    ## 35         North Dakota 48.58 15.71    595
+    ## 36                 Ohio 51.83 16.26    957
+    ## 37             Oklahoma 51.48 16.42    953
+    ## 38               Oregon 51.62 15.90   1451
+    ## 39         Pennsylvania 51.06 15.88   1418
+    ## 40         Rhode Island 53.88 15.46    556
+    ## 41       South Carolina 52.21 16.17    848
+    ## 42         South Dakota 52.04 15.49    708
+    ## 43            Tennessee 51.17 16.36   1032
+    ## 44                Texas 51.22 15.99   2841
+    ## 45                 Utah 49.38 16.64   1529
+    ## 46              Vermont 51.36 15.28    647
+    ## 47             Virginia 51.51 15.66   1496
+    ## 48           Washington 51.08 15.82   2323
+    ## 49        West Virginia 52.13 15.13    718
+    ## 50            Wisconsin 52.10 16.35   1088
+    ## 51              Wyoming 52.49 15.56    683
 
 Although tapply would also work fine.
 
-Here’s the 90th and 10th percentiles of age by state,
+Here’s the 90th and 10th percentiles of age by state, which reminds you
+that there aren’t children in this sample,
 
 ``` r
-ddply(Household_Pulse_data, .(EST_ST), summarize, age90th = quantile((2021 - TBIRTH_YEAR),probs = 0.9), age10th = quantile((2021 - TBIRTH_YEAR),probs = 0.1), n_obs = length(TBIRTH_YEAR))
+ddply(Household_Pulse_data, .(EST_ST), summarize, age90th = quantile((2023 - TBIRTH_YEAR),probs = 0.9), age10th = quantile((2023 - TBIRTH_YEAR),probs = 0.1), n_obs = length(TBIRTH_YEAR))
 ```
 
     ##                  EST_ST age90th age10th n_obs
-    ## 1               Alabama    74.0    30.0   918
-    ## 2                Alaska    71.0    30.0  1232
-    ## 3               Arizona    75.0    32.0  1744
-    ## 4              Arkansas    73.0    31.0   917
-    ## 5            California    74.0    31.0  5359
-    ## 6              Colorado    73.0    31.0  1667
-    ## 7           Connecticut    74.0    32.0  1229
-    ## 8              Delaware    74.9    33.0   892
-    ## 9  District of Columbia    74.0    34.0   761
-    ## 10              Florida    76.0    34.0  2728
-    ## 11              Georgia    74.0    32.0  1655
-    ## 12               Hawaii    74.0    31.0   812
-    ## 13                Idaho    75.0    31.0  1245
-    ## 14             Illinois    73.0    30.0  1387
-    ## 15              Indiana    72.0    31.0  1247
-    ## 16                 Iowa    73.0    33.0   995
-    ## 17               Kansas    72.0    29.0  1315
-    ## 18             Kentucky    72.3    32.0   938
-    ## 19            Louisiana    72.0    31.0   895
-    ## 20                Maine    73.0    32.5   606
-    ## 21             Maryland    74.0    32.4  1605
-    ## 22        Massachusetts    74.0    32.0  1965
-    ## 23             Michigan    74.0    33.0  1753
-    ## 24            Minnesota    72.0    30.0  1488
-    ## 25          Mississippi    73.0    32.0   658
-    ## 26             Missouri    75.0    32.0  1229
-    ## 27              Montana    74.0    32.0   695
-    ## 28             Nebraska    74.0    31.0   997
-    ## 29               Nevada    74.0    32.0  1200
-    ## 30        New Hampshire    75.0    33.9   970
-    ## 31           New Jersey    73.0    34.0  1391
-    ## 32           New Mexico    74.0    33.0  1373
-    ## 33             New York    73.0    30.0  1292
-    ## 34       North Carolina    73.0    32.0  1310
-    ## 35         North Dakota    71.0    32.0   449
-    ## 36                 Ohio    73.0    32.0  1030
-    ## 37             Oklahoma    73.0    33.0   969
-    ## 38               Oregon    73.0    30.0  1934
-    ## 39         Pennsylvania    73.0    31.0  1727
-    ## 40         Rhode Island    73.0    33.0   634
-    ## 41       South Carolina    75.0    32.0  1042
-    ## 42         South Dakota    72.0    32.0   628
-    ## 43            Tennessee    73.0    29.0  1206
-    ## 44                Texas    73.0    30.0  3766
-    ## 45                 Utah    71.0    28.0  1862
-    ## 46              Vermont    74.7    36.0   664
-    ## 47             Virginia    73.0    33.0  1740
-    ## 48           Washington    74.0    32.0  2634
-    ## 49        West Virginia    72.1    32.0   680
-    ## 50            Wisconsin    73.0    31.0  1133
-    ## 51              Wyoming    73.0    35.0   548
+    ## 1               Alabama    71.0    30.0   798
+    ## 2                Alaska    72.0    32.0   717
+    ## 3               Arizona    75.0    31.0  1600
+    ## 4              Arkansas    73.0    30.0   823
+    ## 5            California    73.0    31.0  4066
+    ## 6              Colorado    73.0    30.8  1499
+    ## 7           Connecticut    73.0    31.0   903
+    ## 8              Delaware    75.0    33.0   658
+    ## 9  District of Columbia    71.0    30.0   790
+    ## 10              Florida    76.0    32.0  1977
+    ## 11              Georgia    72.0    31.0  1477
+    ## 12               Hawaii    76.0    33.8   619
+    ## 13                Idaho    73.0    30.0  1344
+    ## 14             Illinois    71.0    30.0  1324
+    ## 15              Indiana    72.0    29.0  1031
+    ## 16                 Iowa    72.0    30.0   987
+    ## 17               Kansas    72.0    30.0  1124
+    ## 18             Kentucky    73.0    29.7   898
+    ## 19            Louisiana    74.0    30.1   772
+    ## 20                Maine    73.0    33.0   694
+    ## 21             Maryland    73.0    32.0  1283
+    ## 22        Massachusetts    72.0    30.0  1410
+    ## 23             Michigan    73.0    31.0  1661
+    ## 24            Minnesota    72.0    31.0  1319
+    ## 25          Mississippi    73.0    30.0   756
+    ## 26             Missouri    72.0    29.0   989
+    ## 27              Montana    72.0    31.0   815
+    ## 28             Nebraska    72.0    30.0  1041
+    ## 29               Nevada    74.0    31.0   887
+    ## 30        New Hampshire    73.0    33.0   907
+    ## 31           New Jersey    72.0    32.0  1051
+    ## 32           New Mexico    75.0    32.0  1186
+    ## 33             New York    71.0    29.0  1038
+    ## 34       North Carolina    74.0    30.0  1003
+    ## 35         North Dakota    70.0    29.4   595
+    ## 36                 Ohio    72.0    29.0   957
+    ## 37             Oklahoma    73.0    29.0   953
+    ## 38               Oregon    73.0    31.0  1451
+    ## 39         Pennsylvania    73.0    31.0  1418
+    ## 40         Rhode Island    72.5    32.5   556
+    ## 41       South Carolina    73.0    29.0   848
+    ## 42         South Dakota    73.0    31.7   708
+    ## 43            Tennessee    73.0    29.0  1032
+    ## 44                Texas    73.0    30.0  2841
+    ## 45                 Utah    73.0    28.0  1529
+    ## 46              Vermont    71.4    31.0   647
+    ## 47             Virginia    73.0    31.0  1496
+    ## 48           Washington    73.0    31.0  2323
+    ## 49        West Virginia    72.0    31.7   718
+    ## 50            Wisconsin    74.0    30.7  1088
+    ## 51              Wyoming    72.0    31.0   683
 
 You could also use table (or crosstabs) for factors with fewer items,
 
@@ -304,28 +305,28 @@ table(EEDUC,GENID_DESCRIBE)
 ```
 
     ##               GENID_DESCRIBE
-    ## EEDUC             NA  male female transgender other
-    ##   less than hs    14   158    204          11    24
-    ##   some hs         25   379    505           7    20
-    ##   HS diploma     154  2844   4734          28    97
-    ##   some coll      207  5569   8607          53   160
-    ##   assoc deg      124  2447   4835          15    87
-    ##   bach deg       319  8143  11401          46   166
-    ##   adv deg        288  7256   9977          42   168
+    ## EEDUC            NA male female transgender other
+    ##   less than hs   18  173    224           5    15
+    ##   some hs        26  323    535           6    21
+    ##   HS diploma    124 2979   4358          25    97
+    ##   some coll     144 5110   7179          76   129
+    ##   assoc deg      68 2263   3710          18    59
+    ##   bach deg      164 7346   8927          69   162
+    ##   adv deg       121 6526   8115          47   128
 
 ``` r
 xtabs(~EEDUC + GENID_DESCRIBE)
 ```
 
     ##               GENID_DESCRIBE
-    ## EEDUC             NA  male female transgender other
-    ##   less than hs    14   158    204          11    24
-    ##   some hs         25   379    505           7    20
-    ##   HS diploma     154  2844   4734          28    97
-    ##   some coll      207  5569   8607          53   160
-    ##   assoc deg      124  2447   4835          15    87
-    ##   bach deg       319  8143  11401          46   166
-    ##   adv deg        288  7256   9977          42   168
+    ## EEDUC            NA male female transgender other
+    ##   less than hs   18  173    224           5    15
+    ##   some hs        26  323    535           6    21
+    ##   HS diploma    124 2979   4358          25    97
+    ##   some coll     144 5110   7179          76   129
+    ##   assoc deg      68 2263   3710          18    59
+    ##   bach deg      164 7346   8927          69   162
+    ##   adv deg       121 6526   8115          47   128
 
 Want proportions instead of counts?
 
@@ -335,13 +336,13 @@ prop.table(table(EEDUC,GENID_DESCRIBE))
 
     ##               GENID_DESCRIBE
     ## EEDUC                    NA         male       female  transgender        other
-    ##   less than hs 0.0002025639 0.0022860781 0.0029516451 0.0001591573 0.0003472524
-    ##   some hs      0.0003617212 0.0054836936 0.0073067685 0.0001012819 0.0002893770
-    ##   HS diploma   0.0022282027 0.0411494053 0.0684955291 0.0004051278 0.0014034783
-    ##   some coll    0.0029950517 0.0805770177 0.1245333796 0.0007668490 0.0023150158
-    ##   assoc deg    0.0017941372 0.0354052724 0.0699568828 0.0002170327 0.0012587898
-    ##   bach deg     0.0046155627 0.1178198339 0.1649593425 0.0006655670 0.0024018289
-    ##   adv deg      0.0041670284 0.1049859652 0.1443557022 0.0006076916 0.0024307666
+    ##   less than hs 3.035925e-04 2.917861e-03 3.778040e-03 8.433125e-05 2.529938e-04
+    ##   some hs      4.385225e-04 5.447799e-03 9.023444e-03 1.011975e-04 3.541913e-04
+    ##   HS diploma   2.091415e-03 5.024456e-02 7.350312e-02 4.216563e-04 1.636026e-03
+    ##   some coll    2.428740e-03 8.618654e-02 1.210828e-01 1.281835e-03 2.175746e-03
+    ##   assoc deg    1.146905e-03 3.816833e-02 6.257379e-02 3.035925e-04 9.951088e-04
+    ##   bach deg     2.766065e-03 1.238995e-01 1.505650e-01 1.163771e-03 2.732333e-03
+    ##   adv deg      2.040816e-03 1.100692e-01 1.368696e-01 7.927138e-04 2.158880e-03
 
 *Remember prop.table later when we do marginals.*
 
@@ -369,7 +370,7 @@ at people in the Northeast, get the same results:
 mean(TBIRTH_YEAR[(REGION == "Northeast")])
 ```
 
-    ## [1] 1967.101
+    ## [1] 1971.19
 
 ``` r
 # alternatively
@@ -382,7 +383,7 @@ attach(dat_northeast)
 mean(TBIRTH_YEAR)
 ```
 
-    ## [1] 1967.101
+    ## [1] 1971.19
 
 ``` r
 detach()

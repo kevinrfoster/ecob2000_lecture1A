@@ -10,7 +10,7 @@ output: github_document
 
 ```{r echo=FALSE}
 
-load("Household_Pulse_data.RData")
+load("Household_Pulse_data_w57.RData")
 attach(Household_Pulse_data)
 
 ```
@@ -23,10 +23,10 @@ hist(TBIRTH_YEAR[(TBIRTH_YEAR < 1950)])
 
 ```
 
-There is a bit of weirdness in the left, where it looks like there are suddenly a bunch of people who were born in 1933 but nobody in 1932 or earlier. This is due to a coding choice by the Census, where really old people are labeled as born in "1933" (top-coding) but it actually should be interpreted as meaning "in 1933 or before". So if you were to get finicky (and every good statistician is!) you might go back to the calculations of averages previously and modify them all. For instance, to select just those who are female and who are coded as having age less than 90. Many variables are topcoded! *And recall that topcoding wouldn't change the median values calculated before, which is a point in favor of that statistic.*
+There is a bit of weirdness in the left, where it looks like there are suddenly a bunch of people who were born in 1935 but many fewer in 1936 or 1938. This is due to a coding choice by the Census, where really old people are labeled as born in "1935" (top-coding) but it actually should be interpreted as meaning "in 1935 or before". So if you were to get finicky (and every good statistician is!) you might go back to the calculations of averages previously and modify them all. For instance, to select just those who are female and who are coded as having birth year after 1935. Many variables are topcoded! *And recall that topcoding wouldn't change the median values calculated before, which is a point in favor of that statistic.*
 
 ```{r}
-mean(TBIRTH_YEAR[ (GENID_DESCRIBE == "female") & (TBIRTH_YEAR > 1933) ]) 
+mean(TBIRTH_YEAR[ (GENID_DESCRIBE == "female") & (TBIRTH_YEAR > 1935) ]) 
 ```
 You go make those other changes, figure out how top-coding changes the calculations of average age by gender -- I'll wait right here...
 
@@ -81,15 +81,15 @@ I know, we'd like if household income were a regular number not a factor, but th
 To find mean and standard deviation of age by state, you could use something like this,
 
 ```{r}
-ddply(Household_Pulse_data, .(EST_ST), summarize, mean = round(mean(2021 - TBIRTH_YEAR), 2), sd = round(sd(2021 - TBIRTH_YEAR), 2), n_obsv = length(EST_ST))
+ddply(Household_Pulse_data, .(EST_ST), summarize, mean = round(mean(2023 - TBIRTH_YEAR), 2), sd = round(sd(2023 - TBIRTH_YEAR), 2), n_obsv = length(EST_ST))
 ```
 Although tapply would also work fine.
 
-Here's the 90th and 10th percentiles of age by state,
+Here's the 90th and 10th percentiles of age by state, which reminds you that there aren't children in this sample,
 
 ```{r}
 
-ddply(Household_Pulse_data, .(EST_ST), summarize, age90th = quantile((2021 - TBIRTH_YEAR),probs = 0.9), age10th = quantile((2021 - TBIRTH_YEAR),probs = 0.1), n_obs = length(TBIRTH_YEAR))
+ddply(Household_Pulse_data, .(EST_ST), summarize, age90th = quantile((2023 - TBIRTH_YEAR),probs = 0.9), age10th = quantile((2023 - TBIRTH_YEAR),probs = 0.1), n_obs = length(TBIRTH_YEAR))
 ```
 
 You could also use table (or crosstabs) for factors with fewer items,
