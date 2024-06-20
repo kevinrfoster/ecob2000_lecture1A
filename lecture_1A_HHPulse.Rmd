@@ -10,7 +10,9 @@ output: github_document
 
 ```{r echo=FALSE}
 
-load("Household_Pulse_data_w57.RData")
+setwd("..\\ecob2000_lecture1")
+load("Household_Pulse_data_ph4c2.RData")
+setwd("..\\ecob2000_lecture1A")
 attach(Household_Pulse_data)
 
 ```
@@ -23,10 +25,10 @@ hist(TBIRTH_YEAR[(TBIRTH_YEAR < 1950)])
 
 ```
 
-There is a bit of weirdness in the left, where it looks like there are suddenly a bunch of people who were born in 1935 but many fewer in 1936 or 1938. This is due to a coding choice by the Census, where really old people are labeled as born in "1935" (top-coding) but it actually should be interpreted as meaning "in 1935 or before". So if you were to get finicky (and every good statistician is!) you might go back to the calculations of averages previously and modify them all. For instance, to select just those who are female and who are coded as having birth year after 1935. Many variables are topcoded! *And recall that topcoding wouldn't change the median values calculated before, which is a point in favor of that statistic.*
+There is a bit of weirdness in the left, where it looks like there are suddenly a bunch of people who were born in 1936 but many fewer in 1937 or 1938. This is due to a coding choice by the Census, where really old people are labeled as born in "1936" (top-coding) but it actually should be interpreted as meaning "in 1936 or before". So if you were to get finicky (and every good statistician is!) you might go back to the calculations of averages previously and modify them all. For instance, to select just those who are female and who are coded as having birth year after 1936. Many variables are topcoded! *And recall that topcoding wouldn't change the median values calculated before, which is a point in favor of that statistic.*
 
 ```{r}
-mean(TBIRTH_YEAR[ (GENID_DESCRIBE == "female") & (TBIRTH_YEAR > 1935) ]) 
+mean(TBIRTH_YEAR[ (GENID_DESCRIBE == "female") & (TBIRTH_YEAR > 1936) ]) 
 ```
 You go make those other changes, figure out how top-coding changes the calculations of average age by gender -- I'll wait right here...
 
@@ -44,7 +46,7 @@ summary(EEDUC)
 ```
 R helpfully provides labels for each of those all together. Later when we get into more depth, we might have to dig into the y/n answers that are underneath.
 
-It's important to remember that there are some cases where the factor values are well ordered (as with highest educational qualification) versus others such as EST_ST (the state the person lives in) where there is not necessarily an ordering.
+It's important to remember that there are some cases where the factor values are well ordered (as with highest educational qualification) versus others such as EST_ST (the state the person lives in) where there is not necessarily an ordering. (It's alphabetical, nothing else.)
 
 Factors are really useful, enough that different people have developed packages specifically to manipulate factors.
 
@@ -56,14 +58,11 @@ Hadley Wickham wrote 'forcats' for categorical data (ie factors). It's part of t
 So enter this into the Console,
 ```
 install.packages("tidyverse")
-install.packages("plyr")
+
 ```
 then
 ```{r message=FALSE}
-
 library(tidyverse)
-library(plyr)
-
 ```
 
 Alt, from R-Studio, click "Tools" then "Install Packages..." and tell it to install the package, "tidyverse". That is nice if you want to see some of the packages or if you don't quite remember the name. Then the next piece of code, library, tells the program that you want to use commands from this package. You only need to install once, then just put library() into your code and run that part.
@@ -81,15 +80,31 @@ I know, we'd like if household income were a regular number not a factor, but th
 To find mean and standard deviation of age by state, you could use something like this,
 
 ```{r}
-ddply(Household_Pulse_data, .(EST_ST), summarize, mean = round(mean(2023 - TBIRTH_YEAR), 2), sd = round(sd(2023 - TBIRTH_YEAR), 2), n_obsv = length(EST_ST))
+Household_Pulse_data %>%
+  group_by(EST_ST) %>%
+  summarize(
+    avg = mean(2024 - TBIRTH_YEAR),
+    stdev = sd(2024 - TBIRTH_YEAR), 
+    n_obs = n()
+  ) 
+
 ```
 Although tapply would also work fine.
 
-Here's the 90th and 10th percentiles of age by state, which reminds you that there aren't children in this sample,
+Here's the 90th and 10th percentiles of age by state, which reminds you that there aren't children in this sample. Then sorts by 90th percentile. 
 
 ```{r}
 
-ddply(Household_Pulse_data, .(EST_ST), summarize, age90th = quantile((2023 - TBIRTH_YEAR),probs = 0.9), age10th = quantile((2023 - TBIRTH_YEAR),probs = 0.1), n_obs = length(TBIRTH_YEAR))
+Household_Pulse_data %>%
+  group_by(EST_ST) %>%
+  summarize(
+    age90th = quantile((2024 - TBIRTH_YEAR),probs = 0.9),
+    age10th = quantile((2024 - TBIRTH_YEAR),probs = 0.1), 
+    n_obs = n()
+  ) %>%
+  arrange(desc(age90th), .by_group = TRUE)
+
+
 ```
 
 You could also use table (or crosstabs) for factors with fewer items,
@@ -156,7 +171,7 @@ All of these racial categories make some people uneasy: is the government encour
 ### Re-Coding complicated variables from initial data
 If we want more combinations of variables then we create those. Usually a statistical analysis spends a lot of time doing this sort of housekeeping - dull but necessary. It has a variety of names: data carpentry, data munging...
 
-For instance this data provides detail about gender id and sexual orientation but summary shows that "NA" is a common classification. They force EGENID_BIRTH to be binary. Depending on what questions you're posing, you might want to combine together the 3 different responses NA, transgender, and other. Or you might not!
+For instance this data provides detail about gender id and sexual orientation but summary shows that "NA" is a common classification. They force EGENID_BIRTH to be binary. Depending on what questions you're posing, you might wonder if it's useful to combine together the 3 different responses NA, transgender, and other. Or you might not!
 
 That's the whole point of learning to do the data work for yourself: you can see all of the little decisions that go into creating a conclusion. Some conclusions might be fragile so a tiny decision about coding could change everything; other conclusions are robust to deviations. You must find out.
 
@@ -167,7 +182,7 @@ Your study group will be very helpful of course.
 
 Often a google search of the error message helps. If you've isolated the error and read the help documentation on that command, then you're on your way to solving the problem on your own.
 
-If you have troubles that you can't solve, email me for help. But try to narrow down your question: if you run 20 lines of code that produce an error, is there a way to reproduce the error in just 5 lines? What if you did the same command on much simpler data, would it still cause an error? Sending emails like "I have a problem with errors" might be cathartic but is not actually useful to anyone. If you email me with the minimal code that recreates the error, along with the text of the error and/or a screenshot, then that will help more.
+If you have troubles that you can't solve, ping me for help. But try to narrow down your question: if you run 20 lines of code that produce an error, is there a way to reproduce the error in just 5 lines? What if you did the same command on much simpler data, would it still cause an error? Sending messages like "I have a problem with errors" might be cathartic but is not actually useful to solving the problem. If you slack me with the minimal code that recreates the error, along with the text of the error and/or a screenshot, then that will help more.
 
 ## Do it
 The first homework assignment asks you to start working on these questions. Begin by running the code that I give here, just to see if you can replicate my results. Then start asking more questions about the data - there is so much info there! Have some fun.
