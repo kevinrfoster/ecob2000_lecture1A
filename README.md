@@ -15,7 +15,7 @@ bit of a twist, look at the histogram.
 hist(TBIRTH_YEAR[(TBIRTH_YEAR < 1950)])
 ```
 
-![](lecture_1A_HHPulse_files/figure-gfm/unnamed-chunk-2-1.png)<!-- -->
+![](Figure1.png)<!-- -->
 
 There is a bit of weirdness in the left, where it looks like there are
 suddenly a bunch of people who were born in 1936 but many fewer in 1937
