@@ -8,68 +8,68 @@ R Basics for Lecture 1 A
 ## Variable Coding
 
 Some of the HouseholdPulse variables here have a natural interpretation,
-for instance TBIRTH_YEAR is measured in years. Actually even this has a
-bit of a twist, look at the histogram.
+for instance Age is measured in years. Actually even this has a bit of a
+twist, look at the histogram.
 
 ``` r
-hist(TBIRTH_YEAR[(TBIRTH_YEAR < 1950)])
+hist(Age[ (Age > 80) ])
 ```
 
-![](Figure1.png)<!-- -->
+![](lecture_1A_HHPulse_files/figure-gfm/unnamed-chunk-2-1.png)<!-- -->
 
-There is a bit of weirdness in the left, where it looks like there are
-suddenly a bunch of people who were born in 1936 but many fewer in 1937
-or 1938. This is due to a coding choice by the Census, where really old
-people are labeled as born in “1936” (top-coding) but it actually should
-be interpreted as meaning “in 1936 or before”. So if you were to get
-finicky (and every good statistician is!) you might go back to the
-calculations of averages previously and modify them all. For instance,
-to select just those who are female and who are coded as having birth
-year after 1936. Many variables are topcoded! *And recall that topcoding
-wouldn’t change the median values calculated before, which is a point in
-favor of that statistic.*
+There is a bit of weirdness in the right, where it looks like there are
+suddenly a bunch of people who were 88 but many fewer who were 87 or 86.
+This is due to a coding choice by the Census, where really old people
+are labeled as “88 years old” (top-coding) but it actually should be
+interpreted as meaning “88 or older”. So if you were to get finicky (and
+every good statistician is!) you might go back to the calculations of
+averages previously and modify them all. For instance, to select just
+those who are female and who are coded as having age less than 88. Many
+variables are topcoded! *And recall that topcoding wouldn’t change the
+median values calculated before, which is a point in favor of that
+statistic.*
 
 ``` r
-mean(TBIRTH_YEAR[ (GENID_DESCRIBE == "female") & (TBIRTH_YEAR > 1936) ]) 
+mean(Age[ (Gender == "female") & (Age < 88) ]) 
 ```
 
-    ## [1] 1970.493
+    ## [1] 51.51615
 
 You go make those other changes, figure out how top-coding changes the
 calculations of average age by gender – I’ll wait right here…
 
 ## Variable Coding Again
 
-So we were saying that some variables, like Birth Year - ahem! – have a
-natural interpretation as a number.
+So we were saying that some variables, like Age - ahem! – have a natural
+interpretation as a number.
 
-Others are logical variables (called dummies) like GENID_DESCRIBE,
-RHISPANIC, or RECVDVACC - there is a series of yes/no answers that are
-coded 1/0. *Note that if you’re creating these on your own it’s good to
-give names that have that sort of yes/no answer, so a variable named
-‘RECVDVACC’ is good, since it’s easy to remember that Yes or No answers
-“did the person receive a vaccine”. If that were labeled as ‘vaccstatus’
+Others are logical variables (called dummies) like Gender, Race, or
+Hispanic - there is a series of yes/no answers that are coded 1/0. *Note
+that if you’re creating these on your own it’s good to give names that
+have that sort of yes/no answer, so a variable named ‘HAS_INSURACE’
+would be good, since it’s easy to remember that Yes or No answers “did
+the person have insurance”. If that were labeled as ‘insurance_status’
 then you’d have to remember who are coded as true and who are false.*
 
 Dummy variables get A TON of use and the R language provides lots of
 help with them – they’re called factors in the R language. Basically a
 factor lumps together a bunch of 0/1 answers.
 
-The factor, ‘RHISPANIC’, is a single y/n or 0/1 answer: is the
-respondent Hispanic. But then EEDUC is a whole bunch of y/n answers: is
-the person’s highest completed educational level less than high school;
-is the person’s highest completed educational level some high school;
-did they end after getting high school diploma; etc. When you ask for a
-summary of EEDUC,
+The factor, ‘Hispanic’, is a single y/n or 0/1 answer: is the respondent
+Hispanic. But then Education is a whole bunch of y/n answers: is the
+person’s highest completed educational level less than high school; is
+the person’s highest completed educational level some high school; did
+they end after getting high school diploma; etc. When you ask for a
+summary of Education,
 
 ``` r
-summary(EEDUC)
+summary(Education)
 ```
 
-    ## less than hs      some hs   HS diploma    some coll    assoc deg     bach deg 
-    ##          585         1282        10094        15415         7614        19137 
-    ##      adv deg 
-    ##        17025
+    ##        lt hs      some hs  high school some college    assoc deg college grad 
+    ##         6787        14934       122541       210698       103575       279400 
+    ##   adv degree 
+    ##       246855
 
 R helpfully provides labels for each of those all together. Later when
 we get into more depth, we might have to dig into the y/n answers that
@@ -77,8 +77,8 @@ are underneath.
 
 It’s important to remember that there are some cases where the factor
 values are well ordered (as with highest educational qualification)
-versus others such as EST_ST (the state the person lives in) where there
-is not necessarily an ordering. (It’s alphabetical, nothing else.)
+versus others such as `State` (the state the person lives in) where
+there is not necessarily an ordering. (It’s alphabetical, nothing else.)
 
 Factors are really useful, enough that different people have developed
 packages specifically to manipulate factors.
@@ -113,7 +113,7 @@ to install the package, “tidyverse”. That is nice if you want to see
 some of the packages or if you don’t quite remember the name. Then the
 next piece of code, library, tells the program that you want to use
 commands from this package. You only need to install once, then just put
-library() into your code and run that part.
+`library()` into your code and run that part.
 
 ### Factors
 
@@ -121,85 +121,70 @@ R will do the summary differently when it knows the variable is a
 factor,
 
 ``` r
-summary(EST_ST)
+summary(State)
 ```
 
     ##              Alabama               Alaska              Arizona 
-    ##                 1074                  825                 2018 
+    ##                13230                15970                26059 
     ##             Arkansas           California             Colorado 
-    ##                  932                 5215                 1860 
+    ##                12931                71958                24746 
     ##          Connecticut             Delaware District of Columbia 
-    ##                 1237                  693                  757 
+    ##                16499                11555                13008 
     ##              Florida              Georgia               Hawaii 
-    ##                 2613                 1957                  764 
+    ##                33825                23538                10694 
     ##                Idaho             Illinois              Indiana 
-    ##                 1099                 1625                 1387 
+    ##                18517                22348                17907 
     ##                 Iowa               Kansas             Kentucky 
-    ##                 1204                 1166                 1107 
+    ##                15547                17328                14104 
     ##            Louisiana                Maine             Maryland 
-    ##                 1021                  759                 1634 
+    ##                12481                10524                22276 
     ##        Massachusetts             Michigan            Minnesota 
-    ##                 1892                 2033                 1461 
+    ##                26236                26479                21160 
     ##          Mississippi             Missouri              Montana 
-    ##                  781                 1350                  680 
+    ##                10391                16868                11519 
     ##             Nebraska               Nevada        New Hampshire 
-    ##                  896                 1001                  981 
+    ##                15248                15658                15337 
     ##           New Jersey           New Mexico             New York 
-    ##                 1287                 1340                 1381 
+    ##                18603                17666                18996 
     ##       North Carolina         North Dakota                 Ohio 
-    ##                 1410                  474                 1287 
+    ##                17425                 8649                16312 
     ##             Oklahoma               Oregon         Pennsylvania 
-    ##                 1195                 1880                 1906 
+    ##                15025                24682                24969 
     ##         Rhode Island       South Carolina         South Dakota 
-    ##                  691                 1170                  752 
+    ##                 9783                14910                 9936 
     ##            Tennessee                Texas                 Utah 
-    ##                 1385                 3456                 1551 
+    ##                16977                49059                25831 
     ##              Vermont             Virginia           Washington 
-    ##                  597                 1896                 2892 
+    ##                10607                25432                37615 
     ##        West Virginia            Wisconsin              Wyoming 
-    ##                  599                 1436                  545
-
-``` r
-summary(INCOME)
-```
-
-    ##                       NA HH income less than $25k  HH income $25k - $34.9k 
-    ##                    12256                     6782                     5156 
-    ##    HH income $35k - 49.9    HH income $50k - 74.9     HH income $75 - 99.9 
-    ##                     6192                     9461                     7844 
-    ##    HH income $100k - 149     HH income $150 - 199        HH income $200k + 
-    ##                    10444                     5537                     7480
-
-I know, we’d like if household income were a regular number not a
-factor, but that’s what Census provides, as a way of helping keep
-confidentiality.
+    ##                11142                17272                 9958
 
 To find mean and standard deviation of age by state, you could use
 something like this,
 
 ``` r
-Household_Pulse_data %>%
-  group_by(EST_ST) %>%
+d_HHP2020_24 %>%
+  group_by(State) %>%
   summarize(
-    avg = mean(2024 - TBIRTH_YEAR),
-    stdev = sd(2024 - TBIRTH_YEAR), 
+    avg = mean(Age),
+    stdev = sd(Age), 
     n_obs = n()
   ) 
 ```
 
     ## # A tibble: 51 × 4
-    ##    EST_ST                 avg stdev n_obs
+    ##    State                  avg stdev n_obs
     ##    <fct>                <dbl> <dbl> <int>
-    ##  1 Alabama               55.1  16.1  1074
-    ##  2 Alaska                53.7  15.6   825
-    ##  3 Arizona               56.6  16.0  2018
-    ##  4 Arkansas              54.2  16.2   932
-    ##  5 California            53.9  15.8  5215
-    ##  6 Colorado              53.2  16.1  1860
-    ##  7 Connecticut           54.4  15.9  1237
-    ##  8 Delaware              57.2  15.8   693
-    ##  9 District of Columbia  45.3  14.3   757
-    ## 10 Florida               57.2  16.1  2613
+    ##  1 Alabama               52.5  16.0 13230
+    ##  2 Alaska                50.9  15.8 15970
+    ##  3 Arizona               54.4  16.4 26059
+    ##  4 Arkansas              52.2  16.0 12931
+    ##  5 California            52.0  15.9 71958
+    ##  6 Colorado              51.5  16.1 24746
+    ##  7 Connecticut           52.7  15.8 16499
+    ##  8 Delaware              55.5  16.0 11555
+    ##  9 District of Columbia  48.4  15.5 13008
+    ## 10 Florida               55.7  16.0 33825
     ## # ℹ 41 more rows
 
 Although tapply would also work fine.
@@ -209,80 +194,80 @@ that there aren’t children in this sample. Then sorts by 90th
 percentile.
 
 ``` r
-Household_Pulse_data %>%
-  group_by(EST_ST) %>%
+d_HHP2020_24 %>%
+  group_by(State) %>%
   summarize(
-    age90th = quantile((2024 - TBIRTH_YEAR),probs = 0.9),
-    age10th = quantile((2024 - TBIRTH_YEAR),probs = 0.1), 
+    age90th = quantile(Age,probs = 0.9),
+    age10th = quantile(Age,probs = 0.1), 
     n_obs = n()
   ) %>%
   arrange(desc(age90th), .by_group = TRUE)
 ```
 
     ## # A tibble: 51 × 4
-    ##    EST_ST        age90th age10th n_obs
-    ##    <fct>           <dbl>   <dbl> <int>
-    ##  1 Arizona          77      34    2018
-    ##  2 Florida          77      34    2613
-    ##  3 Hawaii           77      37.3   764
-    ##  4 New Mexico       77      35    1340
-    ##  5 Delaware         76      35     693
-    ##  6 Idaho            76      34    1099
-    ##  7 Nevada           76      34    1001
-    ##  8 New Hampshire    76      35     981
-    ##  9 West Virginia    76      34     599
-    ## 10 Arkansas         75.9    32     932
+    ##    State          age90th age10th n_obs
+    ##    <fct>            <dbl>   <dbl> <int>
+    ##  1 Florida             76      33 33825
+    ##  2 Arizona             75      31 26059
+    ##  3 Delaware            75      33 11555
+    ##  4 Hawaii              75      33 10694
+    ##  5 New Mexico          75      33 17666
+    ##  6 Maine               74      32 10524
+    ##  7 Montana             74      31 11519
+    ##  8 Nevada              74      32 15658
+    ##  9 New Hampshire       74      32 15337
+    ## 10 South Carolina      74      31 14910
     ## # ℹ 41 more rows
 
 You could also use table (or crosstabs) for factors with fewer items,
 
 ``` r
-table(EEDUC,GENID_DESCRIBE)
+table(Education,Gender)
 ```
 
-    ##               GENID_DESCRIBE
-    ## EEDUC            NA male female transgender other
-    ##   less than hs  342   98    134           3     8
-    ##   some hs       713  233    319           3    14
-    ##   HS diploma   5279 1929   2818          15    53
-    ##   some coll    7877 3200   4204          41    93
-    ##   assoc deg    3987 1373   2200           8    46
-    ##   bach deg     9842 4432   4721          49    93
-    ##   adv deg      8662 3824   4434          28    77
+    ##               Gender
+    ## Education        male female  trans  other
+    ##   lt hs          2847   3727     64    149
+    ##   some hs        5752   9003     45    134
+    ##   high school   48030  73467    243    801
+    ##   some college  85218 123645    572   1263
+    ##   assoc deg     37020  65834    145    576
+    ##   college grad 122956 154321    564   1559
+    ##   adv degree   108713 136467    356   1319
 
 ``` r
-xtabs(~EEDUC + GENID_DESCRIBE)
+xtabs(~ Education + Gender)
 ```
 
-    ##               GENID_DESCRIBE
-    ## EEDUC            NA male female transgender other
-    ##   less than hs  342   98    134           3     8
-    ##   some hs       713  233    319           3    14
-    ##   HS diploma   5279 1929   2818          15    53
-    ##   some coll    7877 3200   4204          41    93
-    ##   assoc deg    3987 1373   2200           8    46
-    ##   bach deg     9842 4432   4721          49    93
-    ##   adv deg      8662 3824   4434          28    77
+    ##               Gender
+    ## Education        male female  trans  other
+    ##   lt hs          2847   3727     64    149
+    ##   some hs        5752   9003     45    134
+    ##   high school   48030  73467    243    801
+    ##   some college  85218 123645    572   1263
+    ##   assoc deg     37020  65834    145    576
+    ##   college grad 122956 154321    564   1559
+    ##   adv degree   108713 136467    356   1319
 
 Want proportions instead of counts?
 
 ``` r
-prop.table(table(EEDUC,GENID_DESCRIBE))
+prop.table(table(Education,Gender))
 ```
 
-    ##               GENID_DESCRIBE
-    ## EEDUC                    NA         male       female  transgender        other
-    ##   less than hs 4.806611e-03 1.377333e-03 1.883292e-03 4.216326e-05 1.124353e-04
-    ##   some hs      1.002080e-02 3.274680e-03 4.483360e-03 4.216326e-05 1.967619e-04
-    ##   HS diploma   7.419328e-02 2.711097e-02 3.960535e-02 2.108163e-04 7.448842e-04
-    ##   some coll    1.107067e-01 4.497414e-02 5.908478e-02 5.762312e-04 1.307061e-03
-    ##   assoc deg    5.603497e-02 1.929672e-02 3.091972e-02 1.124353e-04 6.465033e-04
-    ##   bach deg     1.383236e-01 6.228918e-02 6.635091e-02 6.886665e-04 1.307061e-03
-    ##   adv deg      1.217394e-01 5.374410e-02 6.231729e-02 3.935237e-04 1.082190e-03
+    ##               Gender
+    ## Education              male       female        trans        other
+    ##   lt hs        2.890972e-03 3.784563e-03 6.498847e-05 1.513013e-04
+    ##   some hs      5.840839e-03 9.142051e-03 4.569502e-05 1.360696e-04
+    ##   high school  4.877182e-02 7.460169e-02 2.467531e-04 8.133714e-04
+    ##   some college 8.653418e-02 1.255547e-01 5.808345e-04 1.282507e-03
+    ##   assoc deg    3.759177e-02 6.685080e-02 1.472395e-04 5.848963e-04
+    ##   college grad 1.248550e-01 1.567045e-01 5.727109e-04 1.583079e-03
+    ##   adv degree   1.103921e-01 1.385747e-01 3.614984e-04 1.339372e-03
 
 *Remember prop.table later when we do marginals.*
 
-Try it and see what happens if you use table with EST_ST…
+Try it and see what happens if you use table with State …
 
 ### Alt versions
 
@@ -303,23 +288,23 @@ always add on logical conditions. These two sets of expressions, looking
 at people in the Northeast, get the same results:
 
 ``` r
-mean(TBIRTH_YEAR[(REGION == "Northeast")])
+mean(Age[(Region == "Northeast")])
 ```
 
-    ## [1] 1970.11
+    ## [1] 52.48172
 
 ``` r
 # alternatively
-restrict1 <- as.logical((REGION == "Northeast"))
-dat_northeast <- subset(Household_Pulse_data, restrict1)
+restrict1 <- as.logical((Region == "Northeast"))
+dat_northeast <- subset(d_HHP2020_24, restrict1)
 
 detach()
 attach(dat_northeast)
 
-mean(TBIRTH_YEAR)
+mean(Age)
 ```
 
-    ## [1] 1970.11
+    ## [1] 52.48172
 
 ``` r
 detach()
@@ -339,7 +324,7 @@ later you might have more complicated propositions.
 You might be tired and bored by these details, but note that there are
 actually important choices to be made here, even in simply defining
 variables. Take the fraught American category of “race”. This data has a
-variable, RRACE, showing how people chose to classify themselves, as
+variable, Race, showing how people chose to classify themselves, as
 ‘White,’ ‘Black,’ ‘Asian,’ or other.
 
 In this case the Census has chosen particular values while alternate
@@ -371,17 +356,17 @@ to “prove” which nationalities/races/groups were the smartest. Ta-Nehisi
 Coates notes, “racism invented race in America.” Throughout history,
 statistics have been used to try to prove peoples’ prejudices.
 
-Note that “Hispanic” is not “race” but rather ethnicity (includes
-various other labels such as Spanish, Latino, etc.). So a respondent
-could choose “Hispanic” and any race category – some choose “White,”
-some choose “Black” or “Asian” or “Other”.
+Note that “Hispanic” is not “race” but rather ethnicity (sometimes
+includes various other labels such as Spanish, Latino, etc.). So a
+respondent could choose “Hispanic” and any race category – some choose
+“White,” some choose “Black” or “Asian” or “Other”.
 
 If you wanted to create a variable for those who report themselves as
-Black and Hispanic, you’d use the expression (RRACE == “Black) &
-(RHISPANIC ==”Hispanic”); sometimes government stats report for
-non-Hispanic whites so (RRACE == “White”) & (RHISPANIC != “Hispanic”).
-You can create your own classifications depending on what questions
-you’re investigating.
+Black and Hispanic, you’d use the expression (Race == “Black) &
+(Hispanic ==”Hispanic”); sometimes government stats report for
+non-Hispanic whites so (Race == “White”) & (Hispanic != “Hispanic”). You
+can create your own classifications depending on what questions you’re
+investigating.
 
 The Census Bureau gives more information
 [here](http://www.census.gov/newsroom/minority_links/minority_links.html).
@@ -391,7 +376,9 @@ government encouraging racism by recognizing these classifications? Some
 other governments choose not to collect race data. But that doesn’t mean
 that there are no differences, only that the government doesn’t choose
 to measure any of these differences. In the US, government agencies such
-as the Census and BLS don’t generally collect data on religion.
+as the Census and BLS don’t generally collect data on religion. And
+recent news has discussed about how the US government is now insisting
+that gender is binary.
 
 ### Re-Coding complicated variables from initial data
 
@@ -400,13 +387,7 @@ a statistical analysis spends a lot of time doing this sort of
 housekeeping - dull but necessary. It has a variety of names: data
 carpentry, data munging…
 
-For instance this data provides detail about gender id and sexual
-orientation but summary shows that “NA” is a common classification. They
-force EGENID_BIRTH to be binary. Depending on what questions you’re
-posing, you might wonder if it’s useful to combine together the 3
-different responses NA, transgender, and other. Or you might not!
-
-That’s the whole point of learning to do the data work for yourself: you
+The whole point of learning to do the data work for yourself is that you
 can see all of the little decisions that go into creating a conclusion.
 Some conclusions might be fragile so a tiny decision about coding could
 change everything; other conclusions are robust to deviations. You must
