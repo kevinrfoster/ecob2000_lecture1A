@@ -15,7 +15,7 @@ twist, look at the histogram.
 hist(Age[ (Age > 80) ])
 ```
 
-![](lecture_1A_HHPulse_files/figure-gfm/unnamed-chunk-2-1.png)<!-- -->
+![](Fig1.png)<!-- -->
 
 There is a bit of weirdness in the right, where it looks like there are
 suddenly a bunch of people who were 88 but many fewer who were 87 or 86.
